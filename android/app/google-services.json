@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "315051419993",
+    "firebase_url": "https://app-taxis-domicilio.firebaseio.com",
+    "project_id": "app-taxis-domicilio",
+    "storage_bucket": "app-taxis-domicilio.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:315051419993:android:f1eaf56519e7f8f359c448",
+        "android_client_info": {
+          "package_name": "com.tscorp.AppTaxisAuto"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "315051419993-1prkn9na2rsqd21pkslnramns9q0damo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBwGyTgMRN_Sb6-IllVJvGTj9DK7woqXfI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "315051419993-1prkn9na2rsqd21pkslnramns9q0damo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
