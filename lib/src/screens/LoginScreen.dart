@@ -4,9 +4,6 @@ class Login extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Iniciar sesión'),
-      ),
       body: Center(
         child: FormLogin(),
       ),
@@ -28,49 +25,105 @@ class _FormLoginState extends State<FormLogin> {
     return Form(
       key: _formKey,
       child: Container(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                TextFormField(
-                  decoration: styleInput('Correo electrónico'),
-                  validator: (value) {
-                    if (value.isEmpty) {
-                      return 'Correo requerido';
-                    }
-                  },
-                  style: getStylesTextInput(),
-                ),
-                TextFormField(
-                  decoration: styleInput('Contraseña'),
-                  validator: (value) {
-                    if (value.isEmpty) {
-                      return 'Contraseña requerida';
-                    }
-                  },
-                  style: getStylesTextInput(),
-                  obscureText: true,
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 16.0),
-                  child: RaisedButton(
-                    onPressed: () {
-                      if (_formKey.currentState.validate()) {
-                        Scaffold.of(context).showSnackBar(
-                            SnackBar(content: Text('Procesando datos')));
-                      }
-                    },
-                    child: Text(
-                      'Iniciar sesión',
-                      style: getStylesBoton(),
-                    ),
-                  ),
-                )
-              ],
+        //padding: EdgeInsets.symmetric(vertical: 30),
+        width: double.infinity,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            colors: [
+              Colors.orange[900],
+              Colors.orange[800],
+              Colors.orange[400]
+            ]
+          )
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            SizedBox(height: 100,),
+            Padding(
+              padding: EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Text('Iniciar sesión', style: TextStyle(color: Colors.white, fontSize: 40),)
+                ],
+              ),
             ),
-          ),
+            SizedBox(height: 20,),
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(topLeft: Radius.circular(60), topRight: Radius.circular(60))
+                ),
+                child: Padding(
+                  padding: EdgeInsets.all(30),
+                  child: Column(
+                    children: <Widget>[
+                      SizedBox(height: 20,),
+                      Container(
+                        padding: EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [BoxShadow(
+                            color: Color.fromRGBO(255, 95, 27, .3),
+                            blurRadius: 20,
+                            offset: Offset(0, 10)
+                          )]
+                        ),
+                        child: Column(
+                          children: <Widget>[
+                            Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                border: Border(bottom: BorderSide(color: Colors.grey[200]))
+                              ),
+                              child: TextField(
+                                decoration: InputDecoration(
+                                  hintText: 'Correo electrónico',
+                                  hintStyle: TextStyle(color: Colors.grey),
+                                  border: InputBorder.none
+                                ),
+                              ),
+                            ),
+                            Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                border: Border(bottom: BorderSide(color: Colors.grey[200]))
+                              ),
+                              child: TextField(
+                                decoration: InputDecoration(
+                                  hintText: 'Contraseña',
+                                  hintStyle: TextStyle(color: Colors.grey),
+                                  border: InputBorder.none
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 20,),
+                      Text('¿ Olvido la contraseña ? ', style: TextStyle(color: Colors.grey),),
+                      SizedBox(height: 20,),
+                      Container(
+                        height: 50,
+                        margin: EdgeInsets.symmetric(horizontal: 50),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(50),
+                          color: Colors.orange[900]
+                        ),
+                        child: Center(
+                          child: Text('Iniciar sesión', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            )
+          ],
         ),
       ),
     );
