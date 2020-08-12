@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../screens/CiudadScreen.dart';
 import '../screens/ViajesScreen.dart';
+import '../screens/SolicitudesScreen.dart';
 
 class DrawerNavigation extends StatefulWidget {
   _DrawerState createState() => _DrawerState();
@@ -21,7 +22,7 @@ class _DrawerState extends State<DrawerNavigation> {
 
   _getTituloHeader() {
     switch(_selectDrawerItem) {
-      case 0 : return 'Ciudad';
+      case 0 : return 'Solicitudes';
       case 1 : return 'Viajes';
     }
   }
@@ -57,7 +58,7 @@ class _DrawerState extends State<DrawerNavigation> {
               ),
             ),
             ListTile(
-              title: Text('Ciudad'),
+              title: Text('Solicitudes'),
               leading: Icon(Icons.location_city),
               selected: (0 == _selectDrawerItem),
               onTap: () {

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../models/Usuario.dart';
+import 'package:validators/validators.dart' as validator;
+import '../viewModel/RegistroMV.dart';
 
 class Registro extends StatelessWidget {
   @override
@@ -22,7 +25,16 @@ class FormRegistro extends StatefulWidget {
 }
 
 class _FormRegistroState extends State<FormRegistro> {
+
   final _formKey = GlobalKey<FormState>();
+  Usuario usuario = Usuario();
+
+  RegistroMV authMV = RegistroMV();
+  
+  _registrarUsuario () {
+    authMV.registrarUsuario(usuario.email, usuario.password);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -32,52 +44,80 @@ class _FormRegistroState extends State<FormRegistro> {
           child: Padding(
             padding: EdgeInsets.all(20.0),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 
                 TextFormField(
                   decoration: styleInput('Nombre'),
-                  validator: (value) {
+                  validator: (String value) {
                     if (value.isEmpty) {
                       return 'Nombre requerido';
                     }
+                    return null;
+                  },
+                  onChanged: (String value) {
+                    usuario.nombre = value;
                   },
                   style: getStylesTextInput(),
                 ),
                 TextFormField(
                   decoration: styleInput('Cédula'),
-                  validator: (value) {
+                  validator: (String value) {
                     if (value.isEmpty) {
                       return 'Cédula requerida';
                     }
+                    return null;
+                  },
+                  onChanged: (String value) {
+                    usuario.cedula = value;
                   },
                   style: getStylesTextInput(),
                 ),
                 TextFormField(
                   decoration: styleInput('Correo electrónico'),
-                  validator: (value) {
+                  validator: (String value) {
                     if (value.isEmpty) {
                       return 'Correo requerido';
                     }
+                    if (!validator.isEmail(value)) {
+                      return 'Correo invalido';
+                    }
+                    return null;
+                  },
+                  onChanged: (String value) {
+                    usuario.email = value;
                   },
                   style: getStylesTextInput(),
                 ),
                 TextFormField(
                   decoration: styleInput('Contraseña'),
-                  validator: (value) {
+                  validator: (String value) {
                     if (value.isEmpty) {
                       return 'Contraseña requerida';
                     }
+                    if (value.length < 8) {
+                      return 'Ingrese un minimo de 8 caracteres';
+                    }
+                    return null;
+                  },
+                  onChanged: (String value) {
+                    usuario.password = value;
                   },
                   style: getStylesTextInput(),
                   obscureText: true,
                 ),
                 TextFormField(
                   decoration: styleInput('Repita la Contraseña'),
-                  validator: (value) {
+                  validator: (String value) {
                     if (value.isEmpty) {
-                      return 'Contraseña requerida';
+                      return 'Confirmar contraseña';
                     }
+                    if (usuario.password != null && value != usuario.password) {
+                      //print(usuario.password);
+                      //print(value);
+                      return 'La contraseña no coincide';
+                    }
+                    return null;
                   },
                   style: getStylesTextInput(),
                   obscureText: true,
@@ -88,7 +128,9 @@ class _FormRegistroState extends State<FormRegistro> {
                     onPressed: () {
                       if (_formKey.currentState.validate()) {
                         Scaffold.of(context).showSnackBar(
-                            SnackBar(content: Text('Procesando datos')));
+                            SnackBar(content: Text('Enviando datos')));
+                        _formKey.currentState.save();
+                        _registrarUsuario();
                       }
                     },
                     child: Text(
