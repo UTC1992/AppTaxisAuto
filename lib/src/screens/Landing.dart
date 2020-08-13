@@ -7,8 +7,6 @@ import '../navigation/Drawer.dart';
 
 class Landing extends StatelessWidget {
 
-  
-
   @override
   Widget build(BuildContext context) {
     AuthFirebase authFirebase = Provider.of<AuthFirebase>(context);
@@ -21,7 +19,6 @@ class Landing extends StatelessWidget {
                 return Bienvenida();
               } else {
                 print(user.email);
-                Navigator.pop(context);
                 return DrawerNavigation();
               }
 

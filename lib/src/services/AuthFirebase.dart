@@ -32,4 +32,8 @@ class AuthFirebase extends ChangeNotifier {
     return user;
   }
 
+  Future<FirebaseUser> get currentUser async {
+    return await _auth.currentUser();
+  }
+
 }

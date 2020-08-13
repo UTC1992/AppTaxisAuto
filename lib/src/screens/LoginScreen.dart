@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../viewModel/LoginMV.dart';
+import '../models/UserAutenticacion.dart';
+import 'package:validators/validators.dart' as validator;
 
 class Login extends StatelessWidget {
   @override
@@ -19,113 +22,193 @@ class FormLogin extends StatefulWidget {
 }
 
 class _FormLoginState extends State<FormLogin> {
+  
   final _formKey = GlobalKey<FormState>();
+  UserAutenticacion userAuth = UserAutenticacion();
+
+  LoginMV loginMV = LoginMV();
+
+  _iniciarSesion () {
+    loginMV.iniciarSesion(userAuth.email, userAuth.password);
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
-      child: Container(
-        //padding: EdgeInsets.symmetric(vertical: 30),
-        width: double.infinity,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            colors: [
-              Colors.orange[900],
-              Colors.orange[800],
-              Colors.orange[400]
-            ]
-          )
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            SizedBox(height: 100,),
-            Padding(
-              padding: EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Text('Iniciar sesión', style: TextStyle(color: Colors.white, fontSize: 40),)
-                ],
+    return Stack(
+      alignment: const Alignment(0.6, 0.6),
+      children: [
+        LayoutBuilder(builder:
+            (BuildContext context, BoxConstraints viewportConstraints) {
+          return SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: viewportConstraints.maxHeight,
+              ),
+              child: Form(
+                key: _formKey,
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          colors: [
+                        Colors.orange[900],
+                        Colors.orange[800],
+                        Colors.orange[400]
+                      ])),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        SizedBox(
+                          height: 100,
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              Text(
+                                'Iniciar sesión',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 40),
+                              )
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Padding(
+                        padding: EdgeInsets.all(10),
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(60),
+                                  topRight: Radius.circular(60),
+                                  bottomLeft: Radius.circular(60),
+                                  bottomRight: Radius.circular(60),
+                                  )),
+                          child: Padding(
+                            padding: EdgeInsets.all(30),
+                            child: Column(
+                              children: <Widget>[
+                                SizedBox(
+                                  height: 20,
+                                ),
+                                Container(
+                                  padding: EdgeInsets.all(20),
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(10),
+                                      boxShadow: [
+                                        BoxShadow(
+                                            color:
+                                                Color.fromRGBO(255, 95, 27, .3),
+                                            blurRadius: 20,
+                                            offset: Offset(0, 10))
+                                      ]),
+                                  child: Column(
+                                    children: <Widget>[
+                                      Container(
+                                        padding: EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                            border: Border(
+                                                bottom: BorderSide(
+                                                    color: Colors.grey[200]))),
+                                        child: TextFormField(
+                                          decoration: InputDecoration(
+                                              hintText: 'Correo electrónico',
+                                              hintStyle:
+                                                  TextStyle(color: Colors.grey),
+                                              border: InputBorder.none),
+                                          validator: (String value) {
+                                            if (value.isEmpty) {
+                                              return 'Correo requerido';
+                                            }
+                                            if (!validator.isEmail(value)) {
+                                              return 'Correo invalido';
+                                            }
+                                            return null;
+                                          },
+                                          onChanged: (String value) => userAuth.email = value,
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                            border: Border(
+                                                bottom: BorderSide(
+                                                    color: Colors.grey[200]))),
+                                        child: TextFormField(
+                                          decoration: InputDecoration(
+                                              hintText: 'Contraseña',
+                                              hintStyle:
+                                                  TextStyle(color: Colors.grey),
+                                              border: InputBorder.none),
+                                          validator: (String value) {
+                                            if (value.isEmpty) {
+                                              return 'Contraseña requerida';
+                                            }
+                                            if (value.length < 8) {
+                                              return 'Ingrese un minimo de 8 caracteres';
+                                            }
+                                            return null;
+                                          },
+                                          onChanged: (String value) => userAuth.password = value,
+                                          obscureText: true,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 20,
+                                ),
+                                Text(
+                                  '¿ Olvido la contraseña ? ',
+                                  style: TextStyle(color: Colors.grey),
+                                ),
+                                SizedBox(
+                                  height: 20,
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    if(_formKey.currentState.validate()) {
+                                      _formKey.currentState.save();
+                                      _iniciarSesion();
+                                    }
+                                  },
+                                  child: Container(
+                                    height: 50,
+                                    margin: EdgeInsets.symmetric(horizontal: 50),
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(50),
+                                        color: Colors.orange[900]),
+                                    child: Center(
+                                      child: Text(
+                                        'Iniciar sesión',
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        ),
+                      ]),
+                ),
               ),
             ),
-            SizedBox(height: 20,),
-            Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(topLeft: Radius.circular(60), topRight: Radius.circular(60))
-                ),
-                child: Padding(
-                  padding: EdgeInsets.all(30),
-                  child: Column(
-                    children: <Widget>[
-                      SizedBox(height: 20,),
-                      Container(
-                        padding: EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: [BoxShadow(
-                            color: Color.fromRGBO(255, 95, 27, .3),
-                            blurRadius: 20,
-                            offset: Offset(0, 10)
-                          )]
-                        ),
-                        child: Column(
-                          children: <Widget>[
-                            Container(
-                              padding: EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                border: Border(bottom: BorderSide(color: Colors.grey[200]))
-                              ),
-                              child: TextField(
-                                decoration: InputDecoration(
-                                  hintText: 'Correo electrónico',
-                                  hintStyle: TextStyle(color: Colors.grey),
-                                  border: InputBorder.none
-                                ),
-                              ),
-                            ),
-                            Container(
-                              padding: EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                border: Border(bottom: BorderSide(color: Colors.grey[200]))
-                              ),
-                              child: TextField(
-                                decoration: InputDecoration(
-                                  hintText: 'Contraseña',
-                                  hintStyle: TextStyle(color: Colors.grey),
-                                  border: InputBorder.none
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 20,),
-                      Text('¿ Olvido la contraseña ? ', style: TextStyle(color: Colors.grey),),
-                      SizedBox(height: 20,),
-                      Container(
-                        height: 50,
-                        margin: EdgeInsets.symmetric(horizontal: 50),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(50),
-                          color: Colors.orange[900]
-                        ),
-                        child: Center(
-                          child: Text('Iniciar sesión', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            )
-          ],
-        ),
-      ),
+          );
+        })
+      ],
     );
   }
 

@@ -1,13 +1,6 @@
 class UserAutenticacion {
-  String _email = null;
-  String _password = null;
+  String email;
+  String password;
 
-  String getEmail () {
-    return _email;
-  }
-
-  String getPassword () {
-    return _password;
-  }
-
+  UserAutenticacion({this.email, this.password});
 }

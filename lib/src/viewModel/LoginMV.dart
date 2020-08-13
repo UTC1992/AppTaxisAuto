@@ -1,13 +1,14 @@
 import '../services/AuthFirebase.dart';
 
-class RegistroMV {
+class LoginMV {
 
   AuthFirebase _authFirebase = new AuthFirebase();
 
-  registrarUsuario (email, password) {
-    _authFirebase.registrarUsuario(email, password)
+  iniciarSesion (email, password) {
+    _authFirebase.iniciarSesion(email, password)
     .then((user) {
       if (user != null) {
+        print(user.displayName);
         return true;
       } else {
         return false;
