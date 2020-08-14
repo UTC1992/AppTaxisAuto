@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../ui/view/Ciudad.dart';
+import '../ui/view/Perfil.dart';
 import '../ui/view/Viajes.dart';
 import '../ui/view/Solicitudes.dart';
 import '../services/AuthService.dart';
@@ -18,6 +18,8 @@ class _DrawerState extends State<DrawerNavigation> {
         return Solicitudes();
       case 1 :
         return Viajes();
+      case 2 :
+        return Perfil();
     }
   }
 
@@ -25,6 +27,7 @@ class _DrawerState extends State<DrawerNavigation> {
     switch(_selectDrawerItem) {
       case 0 : return 'Solicitudes';
       case 1 : return 'Viajes';
+      case 2 : return 'Perfil';
     }
   }
 
@@ -60,7 +63,7 @@ class _DrawerState extends State<DrawerNavigation> {
             ),
             ListTile(
               title: Text('Solicitudes'),
-              leading: Icon(Icons.location_city),
+              leading: Icon(Icons.view_list),
               selected: (0 == _selectDrawerItem),
               onTap: () {
                 _onSelectItem(0);
@@ -75,6 +78,14 @@ class _DrawerState extends State<DrawerNavigation> {
               },
             ),
             Divider(),
+            ListTile(
+              title: Text('Perfil'),
+              leading: Icon(Icons.account_circle),
+              selected: (2 == _selectDrawerItem),
+              onTap: () {
+                _onSelectItem(2);
+              },
+            ),
             ListTile(
               title: Text('Cerrar sesión'),
               leading: Icon(Icons.close),

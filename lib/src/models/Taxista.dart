@@ -4,6 +4,7 @@ class Taxista {
   String email;
   String ciudad;
   String password;
+  String documentId;
 
   Taxista({
     this.nombre,
@@ -18,5 +19,15 @@ class Taxista {
     'email': email,
     'ciudad': ciudad,
   };
+
+  Map<String, dynamic> toMapNombre() => {
+    'nombre': nombre,
+  };
+
+  Taxista.fromJson(Map<String, dynamic> json)
+      : nombre = json['nombre'],
+        email = json['email'],
+        cedula = json['cedula'],
+        ciudad = json['ciudad'];
 
 }

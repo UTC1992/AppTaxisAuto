@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'ui/view/Viajes.dart';
-import 'navigation/Drawer.dart';
+import 'navigation/DrawerNavigation.dart';
 import 'ui/view/Landing.dart';
 import 'ui/view/Login.dart';
 import 'ui/view/Registro.dart';
+import 'ui/pages/perfil/EditarNombre.dart';
 import 'services/AuthService.dart';
 import 'package:provider/provider.dart';
 
@@ -42,6 +43,9 @@ class NavigationApp extends StatelessWidget {
               break;
             case '/viajes':
               return MaterialPageRoute(builder: (context)=> Viajes());
+              break;
+            case '/editarNombre':
+              return MaterialPageRoute(builder: (context)=> EditarNombre());
               break;
           }
         },

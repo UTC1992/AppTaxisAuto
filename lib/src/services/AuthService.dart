@@ -7,8 +7,14 @@ class AuthService extends ChangeNotifier {
   // create a getter stream
   Stream<FirebaseUser> get onAuthStateChanged => _auth.onAuthStateChanged;
 
-  Future<FirebaseUser> get currentUser async {
-    return await _auth.currentUser();
+  Future currentUser() async {
+    try {
+      FirebaseUser user = await _auth.currentUser();
+      return user;
+    } catch (e) {
+      return e.toString();
+    }
+    
   }
   
   Future<void> signOut() async {

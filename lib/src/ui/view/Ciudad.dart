@@ -1,4 +1,4 @@
-import 'package:AppTaxisAuto/src/services/AuthService.dart';
+import '../../services/AuthService.dart';
 import 'package:flutter/material.dart';
 import 'Viajes.dart';
 
