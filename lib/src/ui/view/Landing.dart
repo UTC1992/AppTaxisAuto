@@ -1,15 +1,15 @@
-import 'package:AppTaxisAuto/src/services/AuthFirebase.dart';
+import 'package:AppTaxisAuto/src/services/AuthService.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'BienvenidaScreen.dart';
-import '../navigation/Drawer.dart';
+import 'Bienvenida.dart';
+import '../../navigation/Drawer.dart';
 
 class Landing extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    AuthFirebase authFirebase = Provider.of<AuthFirebase>(context);
+    AuthService authFirebase = Provider.of<AuthService>(context);
     return StreamBuilder<FirebaseUser>(
           stream: authFirebase.onAuthStateChanged,
           builder: (context, snapshot) {

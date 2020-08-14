@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'screens/ViajesScreen.dart';
+import 'ui/view/Viajes.dart';
 import 'navigation/Drawer.dart';
-import 'screens/Landing.dart';
-import 'screens/LoginScreen.dart';
-import 'screens/RegistroScreen.dart';
-import 'services/AuthFirebase.dart';
+import 'ui/view/Landing.dart';
+import 'ui/view/Login.dart';
+import 'ui/view/Registro.dart';
+import 'services/AuthService.dart';
 import 'package:provider/provider.dart';
 
 class NavigationApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-        create: (context) => AuthFirebase(), 
+        create: (context) => AuthService(), 
         child: MaterialApp(
         debugShowCheckedModeBanner: false,
         //home: Landing(),
@@ -41,7 +41,7 @@ class NavigationApp extends StatelessWidget {
               return MaterialPageRoute(builder: (context)=> DrawerNavigation());
               break;
             case '/viajes':
-              return MaterialPageRoute(builder: (context)=> ViajesScreen());
+              return MaterialPageRoute(builder: (context)=> Viajes());
               break;
           }
         },

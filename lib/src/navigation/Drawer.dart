@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import '../screens/CiudadScreen.dart';
-import '../screens/ViajesScreen.dart';
-import '../screens/SolicitudesScreen.dart';
+import '../ui/view/Ciudad.dart';
+import '../ui/view/Viajes.dart';
+import '../ui/view/Solicitudes.dart';
+import '../services/AuthService.dart';
 
 class DrawerNavigation extends StatefulWidget {
   _DrawerState createState() => _DrawerState();
@@ -14,9 +15,9 @@ class _DrawerState extends State<DrawerNavigation> {
   _getDrawerItemWidget(int posicion) {
     switch(posicion) {
       case 0 : 
-        return CiudadScreen();
+        return Solicitudes();
       case 1 :
-        return ViajesScreen();
+        return Viajes();
     }
   }
 
@@ -74,6 +75,15 @@ class _DrawerState extends State<DrawerNavigation> {
               },
             ),
             Divider(),
+            ListTile(
+              title: Text('Cerrar sesión'),
+              leading: Icon(Icons.close),
+              selected: false,
+              onTap: () {
+                AuthService auth = AuthService();
+                auth.signOut();
+              },
+            ),
           ],
         ),
       ),

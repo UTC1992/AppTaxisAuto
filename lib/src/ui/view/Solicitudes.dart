@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-class SolicitudesScreen extends StatefulWidget {
+class Solicitudes extends StatefulWidget {
 
   _SolicitudState createState() => _SolicitudState();
 
 }
 
-class _SolicitudState extends State<SolicitudesScreen> {
+class _SolicitudState extends State<Solicitudes> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../screens/CiudadScreen.dart';
+import '../ui/view/Ciudad.dart';
 
 class TabBottomNavigation extends StatefulWidget {
   _TabState createState() => _TabState();
@@ -32,8 +32,8 @@ class _TabState extends State<TabBottomNavigation> with SingleTickerProviderStat
         title: Text('Tab Navigator'),
       ),
       body: getTabBarView(<Widget>[
-        CiudadScreen(),
-        CiudadScreen(),
+        Ciudad(),
+        Ciudad(),
       ]),
       bottomNavigationBar: getTabBar(),
 

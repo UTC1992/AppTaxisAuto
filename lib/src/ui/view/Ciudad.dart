@@ -1,13 +1,12 @@
-import 'package:AppTaxisAuto/src/services/AuthFirebase.dart';
+import 'package:AppTaxisAuto/src/services/AuthService.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'ViajesScreen.dart';
+import 'Viajes.dart';
 
-class CiudadScreen extends StatefulWidget {
+class Ciudad extends StatefulWidget {
   _CiudadState createState() => _CiudadState();
 }
 
-class _CiudadState extends State<CiudadScreen>
+class _CiudadState extends State<Ciudad>
     with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
@@ -21,7 +20,7 @@ class _CiudadState extends State<CiudadScreen>
               child: Text('Ir a pantalla 2'),
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => ViajesScreen(),
+                  builder: (context) => Viajes(),
                 ));
               },
             ),
@@ -31,7 +30,7 @@ class _CiudadState extends State<CiudadScreen>
             child: RaisedButton(
               child: Text('cerrar sesion'),
               onPressed: () {
-                AuthFirebase auth = AuthFirebase();
+                AuthService auth = AuthService();
                 auth.signOut();
               },
             ),

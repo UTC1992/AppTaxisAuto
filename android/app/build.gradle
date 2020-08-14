@@ -23,6 +23,7 @@ if (flutterVersionName == null) {
 
 apply plugin: 'com.android.application'
 
+//servicios google firebase
 apply plugin: 'com.google.gms.google-services'
 
 apply plugin: 'kotlin-android'

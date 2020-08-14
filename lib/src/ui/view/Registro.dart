@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import '../models/Usuario.dart';
+import '../../models/Taxista.dart';
+import '../../models/UserAutenticacion.dart';
 import 'package:validators/validators.dart' as validator;
-import '../viewModel/RegistroMV.dart';
+import '../../viewmodel/RegistroViewModel.dart';
 
 class Registro extends StatelessWidget {
   @override
@@ -27,12 +28,15 @@ class FormRegistro extends StatefulWidget {
 class _FormRegistroState extends State<FormRegistro> {
 
   final _formKey = GlobalKey<FormState>();
-  Usuario usuario = Usuario();
+  Taxista taxista = Taxista();
+  UserAutenticacion userAut = UserAutenticacion();
 
-  RegistroMV authMV = RegistroMV();
+  RegistroViewModel _registroViewModel = RegistroViewModel();
   
   _registrarUsuario () {
-    authMV.registrarUsuario(usuario.email, usuario.password);
+    print(taxista.nombre);
+    _registroViewModel.singUp(email: userAut.email, password: userAut.password, taxista: taxista);
+    Navigator.pop(context);
   }
 
   @override
@@ -56,7 +60,7 @@ class _FormRegistroState extends State<FormRegistro> {
                     return null;
                   },
                   onChanged: (String value) {
-                    usuario.nombre = value;
+                    taxista.nombre = value;
                   },
                   style: getStylesTextInput(),
                 ),
@@ -69,7 +73,7 @@ class _FormRegistroState extends State<FormRegistro> {
                     return null;
                   },
                   onChanged: (String value) {
-                    usuario.cedula = value;
+                    taxista.cedula = value;
                   },
                   style: getStylesTextInput(),
                 ),
@@ -85,7 +89,8 @@ class _FormRegistroState extends State<FormRegistro> {
                     return null;
                   },
                   onChanged: (String value) {
-                    usuario.email = value;
+                    taxista.email = value;
+                    userAut.email = value;
                   },
                   style: getStylesTextInput(),
                 ),
@@ -101,7 +106,7 @@ class _FormRegistroState extends State<FormRegistro> {
                     return null;
                   },
                   onChanged: (String value) {
-                    usuario.password = value;
+                    userAut.password = value;
                   },
                   style: getStylesTextInput(),
                   obscureText: true,
@@ -112,7 +117,7 @@ class _FormRegistroState extends State<FormRegistro> {
                     if (value.isEmpty) {
                       return 'Confirmar contraseña';
                     }
-                    if (usuario.password != null && value != usuario.password) {
+                    if (userAut.password != null && value != userAut.password) {
                       //print(usuario.password);
                       //print(value);
                       return 'La contraseña no coincide';

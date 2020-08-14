@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class ViajesScreen extends StatelessWidget {
+class Viajes extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

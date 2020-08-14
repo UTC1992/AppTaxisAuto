@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../viewModel/LoginMV.dart';
-import '../models/UserAutenticacion.dart';
+import '../../viewmodel/LoginViewModel.dart';
+import '../../models/UserAutenticacion.dart';
 import 'package:validators/validators.dart' as validator;
 
 class Login extends StatelessWidget {
@@ -26,10 +26,10 @@ class _FormLoginState extends State<FormLogin> {
   final _formKey = GlobalKey<FormState>();
   UserAutenticacion userAuth = UserAutenticacion();
 
-  LoginMV loginMV = LoginMV();
+  LoginViewModel _loginViewModel = LoginViewModel();
 
   _iniciarSesion () {
-    loginMV.iniciarSesion(userAuth.email, userAuth.password);
+    _loginViewModel.login(email: userAuth.email, password: userAuth.password);
     Navigator.pop(context);
   }
 
