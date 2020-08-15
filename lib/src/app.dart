@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
-import 'ui/view/Viajes.dart';
-import 'navigation/DrawerNavigation.dart';
-import 'ui/view/Landing.dart';
-import 'ui/view/Login.dart';
-import 'ui/view/Registro.dart';
-import 'ui/pages/perfil/EditarNombre.dart';
 import 'services/AuthService.dart';
 import 'package:provider/provider.dart';
+import 'navigation/RouteGenerator.dart';
 
 class NavigationApp extends StatelessWidget {
   @override
@@ -19,36 +14,7 @@ class NavigationApp extends StatelessWidget {
         initialRoute: '/',
         theme: ThemeData(
             primaryColor: Colors.green[700], accentColor: Colors.green[600]),
-        /*routes: <String, WidgetBuilder>{
-          '/': (context) => Landing(),
-          '/login': (context) => Login(),
-          '/registro': ( context) => Registro(),
-          '/pedidos': ( context) => DrawerNavigation(),
-          '/viajes': ( context) => ViajesScreen(),
-        },
-        */
-        onGenerateRoute: (RouteSettings settings) {
-          switch (settings.name) {
-            case '/':
-              return MaterialPageRoute(builder: (context)=> Landing());
-              break;
-            case '/login':
-              return MaterialPageRoute(builder: (context)=> Login());
-              break;
-            case '/registro':
-              return MaterialPageRoute(builder: (context)=> Registro());
-              break;
-            case '/pedidos':
-              return MaterialPageRoute(builder: (context)=> DrawerNavigation());
-              break;
-            case '/viajes':
-              return MaterialPageRoute(builder: (context)=> Viajes());
-              break;
-            case '/editarNombre':
-              return MaterialPageRoute(builder: (context)=> EditarNombre());
-              break;
-          }
-        },
+        onGenerateRoute: RouteGenerator.generateRoute,
       )
     );
   }

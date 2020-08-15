@@ -1,9 +1,15 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import '../models/Taxista.dart';
 
 class TaxistaService {
   final CollectionReference _collectionReference =
       Firestore.instance.collection('col_taxista');
+  
+  // Create the controller that will broadcast the posts
+  final StreamController<Taxista> _taxistaController =
+      StreamController<Taxista>.broadcast();
   
   Future addTaxista(Taxista taxista) async {
     try {
@@ -14,31 +20,75 @@ class TaxistaService {
     }
   }
 
-  Future getTaxistaByEmail(String email) async {
+  Stream getTaxistaByEmail(String email) {
     try {
-      QuerySnapshot result = await _collectionReference
+      _collectionReference
       .where('email', isEqualTo: email)
-      .getDocuments();
+      .snapshots().listen((result) {
+        
+        //convertir a objeto taxista
+        var data;
 
-      //convertir a objeto taxista
-      var data;
+        result.documents.forEach((res) {
+          //print(res.data['nombre']);
+          data = {
+            'id' : res.documentID,
+            'nombre' : res.data['nombre'],
+            'cedula' : res.data['cedula'],
+            'email' : res.data['email'],
+            'telefono' : res.data['telefono'],
+            'ciudad' : res.data['ciudad'],
+            'urlImagen' : res.data['urlImagen'],
+          };
+        });
+        Taxista taxista = Taxista.fromJson(data);
+        _taxistaController.add(taxista);
+       });
 
-      result.documents.forEach((res) {
-        print(res.documentID);
-        data = res.data;
-      });
-    
-      return data;
+      return _taxistaController.stream;
+    } catch (e) {
+      return e;
+    }
+  }
+
+  Future updateNombre({
+    @required String documentID, 
+    @required String nombre,
+  }) async {
+    try {
+      await _collectionReference
+      .document(documentID)
+      .updateData({'nombre':nombre});
+
+      return true;
     } catch (e) {
       return e.toString();
     }
   }
 
-  Future updateTaxista(Taxista taxista) async {
+  Future updateTelefono({
+    @required String documentID, 
+    @required String telefono,
+  }) async {
     try {
       await _collectionReference
-      .document(taxista.documentId)
-      .updateData(taxista.toMapNombre());
+      .document(documentID)
+      .updateData({'telefono': telefono});
+
+      return true;
+    } catch (e) {
+      return e.toString();
+    }
+  }
+
+  Future updateUrlImagen({
+    @required String documentID, 
+    @required String urlImagen,
+  }) async {
+    try {
+      await _collectionReference
+      .document(documentID)
+      .updateData({'urlImagen': urlImagen});
 
       return true;
     } catch (e) {

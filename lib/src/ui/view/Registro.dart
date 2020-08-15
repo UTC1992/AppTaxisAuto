@@ -1,3 +1,4 @@
+import 'package:AppTaxisAuto/src/models/Ciudad.dart';
 import 'package:flutter/material.dart';
 import '../../models/Taxista.dart';
 import '../../models/UserAutenticacion.dart';
@@ -30,13 +31,33 @@ class _FormRegistroState extends State<FormRegistro> {
   final _formKey = GlobalKey<FormState>();
   Taxista taxista = Taxista();
   UserAutenticacion userAut = UserAutenticacion();
-
   RegistroViewModel _registroViewModel = RegistroViewModel();
+  var ciudades = new List<Ciudad>();
+  final ciudadTextController = TextEditingController();
   
-  _registrarUsuario () {
+  _registrarUsuario() {
     print(taxista.nombre);
-    _registroViewModel.singUp(email: userAut.email, password: userAut.password, taxista: taxista);
+    taxista.estado = false;
+    _registroViewModel.singUp(email: userAut.email.trim(), password: userAut.password, taxista: taxista);
     Navigator.pop(context);
+  }
+
+  _getCiudades() async {
+    ciudades = await _registroViewModel.getCiudades();
+    print(ciudades[0].nombre);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _getCiudades();
+  }
+
+  @override
+  void dispose() {
+    // Limpia el controlador cuando el widget se elimine del árbol de widgets
+    ciudadTextController.dispose();
+    super.dispose();
   }
 
   @override
@@ -52,6 +73,7 @@ class _FormRegistroState extends State<FormRegistro> {
               children: <Widget>[
                 
                 TextFormField(
+                  textCapitalization: TextCapitalization.words,
                   decoration: styleInput('Nombre'),
                   validator: (String value) {
                     if (value.isEmpty) {
@@ -66,9 +88,13 @@ class _FormRegistroState extends State<FormRegistro> {
                 ),
                 TextFormField(
                   decoration: styleInput('Cédula'),
+                  keyboardType: TextInputType.number,
                   validator: (String value) {
                     if (value.isEmpty) {
                       return 'Cédula requerida';
+                    }
+                    if (value.length < 10 || value.length > 10) {
+                      return 'Cédula invalida, debe tener 10 digitos';
                     }
                     return null;
                   },
@@ -79,6 +105,7 @@ class _FormRegistroState extends State<FormRegistro> {
                 ),
                 TextFormField(
                   decoration: styleInput('Correo electrónico'),
+                  keyboardType: TextInputType.emailAddress,
                   validator: (String value) {
                     if (value.isEmpty) {
                       return 'Correo requerido';
@@ -93,6 +120,23 @@ class _FormRegistroState extends State<FormRegistro> {
                     userAut.email = value;
                   },
                   style: getStylesTextInput(),
+                ),
+                TextFormField(
+                  decoration: styleInput('Teléfono'),
+                  validator: (String value) {
+                    if (value.isEmpty) {
+                      return 'Teléfono requerido';
+                    }
+                    if (value.length < 10) {
+                      return 'Teléfono invalido, debe tener 10 digitos';
+                    }
+                    return null;
+                  },
+                  onChanged: (String value) {
+                    taxista.telefono = value;
+                  },
+                  style: getStylesTextInput(),
+                  keyboardType: TextInputType.phone,
                 ),
                 TextFormField(
                   decoration: styleInput('Contraseña'),
@@ -127,6 +171,25 @@ class _FormRegistroState extends State<FormRegistro> {
                   style: getStylesTextInput(),
                   obscureText: true,
                 ),
+                TextFormField(
+                    controller: ciudadTextController,
+                    decoration: InputDecoration(
+                      hintText: 'Ciudad',
+                      suffixIcon: Icon(Icons.expand_more),
+                    ),
+                    validator: (String value) {
+                      if (value.isEmpty) {
+                        return 'Ciudad requerida';
+                      }
+                      return null;
+                    },
+                    readOnly: true,
+                    onTap: () {
+                      _mostrarCiudades();
+                    },
+                    style: getStylesTextInput(),
+                    
+                ),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 16.0),
                   child: RaisedButton(
@@ -135,7 +198,8 @@ class _FormRegistroState extends State<FormRegistro> {
                         Scaffold.of(context).showSnackBar(
                             SnackBar(content: Text('Enviando datos')));
                         _formKey.currentState.save();
-                        _registrarUsuario();
+                       _registrarUsuario();
+                       
                       }
                     },
                     child: Text(
@@ -152,8 +216,56 @@ class _FormRegistroState extends State<FormRegistro> {
     );
   }
 
+  _asignarCiudad(nombre) {
+    ciudadTextController.text = nombre; 
+  }
+  
+  // user defined function
+  void _mostrarCiudades() {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Ciudades disponibles"),
+          content: SingleChildScrollView(
+          child: Container(
+            width: 300,
+            height: 200,
+            child: ListView.builder(
+              itemCount: ciudades.length,
+              itemBuilder: (context, index) {
+                return GestureDetector( 
+                  onTap: () {
+                    taxista.ciudad = ciudades[index].nombre;
+                    _asignarCiudad(ciudades[index].nombre);
+                    Navigator.of(context).pop();
+                  },
+                  child: ListTile(title: Text(ciudades[index].nombre),)
+                );
+              }
+            ),
+          ),
+          ),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Ok", style: TextStyle(fontSize: 16),),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   InputDecoration styleInput(placeholder) {
-    return InputDecoration(labelText: placeholder, hintText: placeholder);
+    return InputDecoration(
+      hintText: placeholder
+      );
   }
 
   ///
@@ -175,6 +287,9 @@ class _FormRegistroState extends State<FormRegistro> {
       fontSize: 18.0,
     );
   }
+
+
+
 }
 
 /* new Image.network(

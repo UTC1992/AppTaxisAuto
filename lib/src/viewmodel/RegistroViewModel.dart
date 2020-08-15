@@ -1,12 +1,15 @@
+import 'package:AppTaxisAuto/src/services/CiudadService.dart';
+import 'package:AppTaxisAuto/src/models/Ciudad.dart';
 import 'package:flutter/cupertino.dart';
 import '../services/AuthService.dart';
 import '../models/Taxista.dart';
 import '../services/TaxistaService.dart';
 
-class RegistroViewModel {
+class RegistroViewModel extends AuthService {
 
   AuthService _authService = new AuthService();
   TaxistaService _taxistaService = new TaxistaService();
+  CiudadService _ciudadService = new CiudadService();
 
   //registrar usuario en firebase
   Future singUp({
@@ -37,6 +40,16 @@ class RegistroViewModel {
       print('Taxista registrado');
     }
 
+  }
+
+  Future getCiudades() async {
+    var ciudadResult = await _ciudadService.getCiudadAll();
+    if(ciudadResult is List<Ciudad>) {
+      notifyListeners();
+      return ciudadResult;
+    } else {
+      print('Fallo el obtener las ciudades' + ciudadResult);
+    }
   }
 
 }

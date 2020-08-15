@@ -2,33 +2,33 @@ import 'package:flutter/material.dart';
 import '../../../viewmodel/TaxistaViewModel.dart';
 import '../../../models/Taxista.dart';
 
-class EditarNombre extends StatefulWidget {
+class EditarTelefono extends StatefulWidget {
   final Taxista data;
 
-  EditarNombre({
+  EditarTelefono({
     Key key,
     @required this.data,
   }) : super(key: key);
 
-  _EditarNombreState createState() => _EditarNombreState();
+  _EditarTelefonoState createState() => _EditarTelefonoState();
 }
 
-class _EditarNombreState extends State<EditarNombre> {
+class _EditarTelefonoState extends State<EditarTelefono> {
   
   final _formKey = GlobalKey<FormState>();
   TaxistaViewModel _taxistaViewModel = TaxistaViewModel();
-  String nombre;
+  String telefono;
   String documentID;
 
   @override
   void initState() {
     super.initState(); 
-    nombre = widget.data.nombre;
+    telefono = widget.data.telefono;
     documentID = widget.data.documentId;
   }
 
-  _updateNombreTaxista () {
-    _taxistaViewModel.updateNombre(nombre: nombre.trim(), documentID: documentID);
+  _updateTelefonoTaxista () {
+    _taxistaViewModel.updateTelefono(telefono: telefono.trim(), documentID: documentID);
     Navigator.pop(context);
   }
 
@@ -36,7 +36,7 @@ class _EditarNombreState extends State<EditarNombre> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Editar nombre'),
+        title: Text('Editar teléfono'),
       ),
       body: getContainer(),
     );
@@ -58,21 +58,25 @@ class _EditarNombreState extends State<EditarNombre> {
                 ),
                 Padding(
                   padding: EdgeInsets.all(10),
-                  child: Text('NOMBRE Y APELLIDO'),
+                  child: Text('TELÉFONO DEL USUARIO'),
                 ),
                 Padding(
                   padding: EdgeInsets.symmetric( horizontal: 20),
                   child: TextFormField(
-                    controller: TextEditingController(text: nombre+' '),
+                    controller: TextEditingController(text: telefono+' '),
                     autofocus: true,
+                    keyboardType: TextInputType.phone,
                     validator: (value) {
                       if(value.isEmpty) {
-                        return 'Debe ingresar su nombre y apellido';
+                        return 'Teléfono requerido.';
+                      }
+                      if(value.length < 10) {
+                        return 'Teléfono invalido, debe tener 10 digitos.';
                       }
                       return null;
                     },
                     onChanged: (value) {
-                      nombre = value;
+                      telefono = value;
                     },
                   ),
                 ),
@@ -83,7 +87,7 @@ class _EditarNombreState extends State<EditarNombre> {
                   onTap: () {
                     if(_formKey.currentState.validate()) {
                       _formKey.currentState.save();
-                      _updateNombreTaxista();
+                      _updateTelefonoTaxista();
                     }
                   },
                   child: Container(
