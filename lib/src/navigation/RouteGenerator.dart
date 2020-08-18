@@ -7,6 +7,9 @@ import '../ui/view/Viajes.dart';
 import '../ui/pages/perfil/EditarNombre.dart';
 import '../ui/pages/perfil/EditarTelefono.dart';
 import '../ui/pages/perfil/EditarImagen.dart';
+import '../ui/pages/perfil/EditarCorreo.dart';
+import '../ui/pages/perfil/EditarPassword.dart';
+import '../ui/pages/perfil/EditarCiudad.dart';
 import './DrawerNavigation.dart';
 
 class RouteGenerator {
@@ -56,6 +59,35 @@ class RouteGenerator {
         if (args is Taxista) {
           return MaterialPageRoute(
             builder: (_) => EditarImagen( data: args,),
+          );
+        } 
+        
+        return _errorRoute();
+
+        break;
+      case '/editarCorreo':
+
+        if (args is Taxista) {
+          return MaterialPageRoute(
+            builder: (_) => EditarCorreo( data: args,),
+          );
+        } 
+        
+        return _errorRoute();
+
+        break;
+      case '/editarPassword':
+
+        return MaterialPageRoute(
+            builder: (context) => EditarPassword(),
+          );
+
+        break;
+      case '/editarCiudad':
+
+        if (args is Taxista) {
+          return MaterialPageRoute(
+            builder: (_) => EditarCiudad( data: args,),
           );
         } 
         

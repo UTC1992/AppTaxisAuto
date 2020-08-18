@@ -95,7 +95,10 @@ class _PerfilState extends State<Perfil> {
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.pushNamed(context, '/editarCorreo',
+                          arguments: taxista);
+                    },
                     child: Row(
                       children: [
                         Icon(Icons.email, color: Colors.grey[600]),
@@ -112,7 +115,9 @@ class _PerfilState extends State<Perfil> {
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.pushNamed(context, '/editarPassword');
+                    },
                     child: Row(
                       children: [
                         Icon(Icons.lock, color: Colors.grey[600]),
@@ -139,6 +144,26 @@ class _PerfilState extends State<Perfil> {
                         Expanded(
                           child: ListTile(
                             title: Text('Editar teléfono'),
+                          ),
+                        ),
+                        Icon(Icons.chevron_right, color: Colors.grey[500])
+                      ],
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: GestureDetector(
+                    onTap: () {
+                       Navigator.pushNamed(context, '/editarCiudad',
+                          arguments: taxista);
+                    },
+                    child: Row(
+                      children: [
+                        Icon(Icons.location_city, color: Colors.grey[600]),
+                        Expanded(
+                          child: ListTile(
+                            title: Text('Editar ciudad'),
                           ),
                         ),
                         Icon(Icons.chevron_right, color: Colors.grey[500])

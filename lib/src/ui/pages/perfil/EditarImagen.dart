@@ -37,7 +37,7 @@ class _EditarImagenState extends State<EditarImagen> {
   _updateUrlImagenTaxista() {
     _taxistaViewModel.updateUrlImagen(
         urlImagen: _uploadedFileURL, documentID: documentID);
-    Navigator.pop(context);
+    //Navigator.pop(context);
   }
 
   Future getImage() async {
@@ -85,8 +85,9 @@ class _EditarImagenState extends State<EditarImagen> {
                   height: 300,
                   decoration: BoxDecoration(
                     color: Colors.black,
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                  child: urlImagen != null
+                  child: urlImagen != ''
                       ? Image.network(urlImagen)
                       : _imagen != null
                           ? Image.file(_imagen)
@@ -125,7 +126,33 @@ class _EditarImagenState extends State<EditarImagen> {
                     ),
                   ),
                 ),
-              )
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              GestureDetector(
+                onTap: () {
+                  deleteImagen();
+                },
+                child: Container(
+                  height: 40,
+                  margin: EdgeInsets.symmetric(horizontal: 80),
+                  decoration: BoxDecoration(
+                    color: Colors.red[700],
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Center(
+                    child: Text(
+                      'Eliminar',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ],
@@ -134,33 +161,44 @@ class _EditarImagenState extends State<EditarImagen> {
   }
 
   Future uploadFile() async {
-    StorageReference storageReference = FirebaseStorage.instance
-        .ref()
-        .child(documentID + '/configuracion/' + documentID + '.jpeg');
-    StorageUploadTask uploadTask = storageReference.putFile(_imagen);
-    await uploadTask.onComplete;
-    print('File Uploaded');
-    storageReference.getDownloadURL().then((fileURL) {
-      setState(() {
-        _uploadedFileURL = fileURL;
+    if(_imagen != null) {
+      StorageReference storageReference = FirebaseStorage.instance
+          .ref()
+          .child(documentID + '/configuracion/' + documentID + '.jpeg');
+      StorageUploadTask uploadTask = storageReference.putFile(_imagen);
+      await uploadTask.onComplete;
+      print('File Uploaded');
+      storageReference.getDownloadURL().then((fileURL) {
+        setState(() {
+          urlImagen = fileURL;
+          _uploadedFileURL = fileURL;
+        });
+        _updateUrlImagenTaxista();
+        //print(fileURL);
       });
-      _updateUrlImagenTaxista();
-      //print(fileURL);
-    });
+    }
   }
 
-  deleteFile() {
-    StorageReference storageReference = FirebaseStorage.instance
-        .ref()
-        .child(documentID + '/configuracion/' + documentID + '.jpeg');
-    storageReference.delete()
-    .then((value) {
-      print('imagen eliminada');
-    })
-    .catchError((onError){
-      print(onError);
-    });
+  deleteImagen() {
+    if(urlImagen != '') {
+      StorageReference storageReference = FirebaseStorage.instance
+          .ref()
+          .child(documentID + '/configuracion/' + documentID + '.jpeg');
+      storageReference.delete()
+      .then((value) {
+        print('imagen eliminada');
+        setState(() {
+          urlImagen = '';
+          _imagen = null;
+          _uploadedFileURL = '';
+        });
+        _updateUrlImagenTaxista();
+      })
+      .catchError((onError){
+        print(onError);
+      });
+    } else {
     
-    
-  }
+    }
+  } 
 }

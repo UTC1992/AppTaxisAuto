@@ -50,6 +50,47 @@ class AuthService extends ChangeNotifier {
       }
   }
 
-  
+  Future reautenticate(
+    password,
+  ) async {
+    try {
+      FirebaseUser user = await _auth.currentUser();
+      AuthResult authResult = await user.reauthenticateWithCredential(
+        EmailAuthProvider.getCredential(
+          email: user.email,
+          password: password
+        ));
+      return authResult;
+    } catch (e) {
+      return e.toString();
+    }
+    
+  }
+
+  Future updateEmail({
+      @required String email,
+  }) async {
+      try {
+        FirebaseUser user = await _auth.currentUser();
+        var result = await user.updateEmail(email);
+        notifyListeners();
+        return result;
+      } catch (e) {
+          return e.toString();
+      }
+  }
+
+  Future updatePassword({
+      @required String password,
+  }) async {
+      try {
+        FirebaseUser user = await _auth.currentUser();
+        var result = await user.updatePassword(password);
+        notifyListeners();
+        return result;
+      } catch (e) {
+          return e.toString();
+      }
+  }
 
 }

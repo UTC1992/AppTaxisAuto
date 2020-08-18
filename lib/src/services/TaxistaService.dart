@@ -30,7 +30,7 @@ class TaxistaService {
         var data;
 
         result.documents.forEach((res) {
-          //print(res.data['nombre']);
+          print(res.data['nombre']);
           data = {
             'id' : res.documentID,
             'nombre' : res.data['nombre'],
@@ -39,6 +39,7 @@ class TaxistaService {
             'telefono' : res.data['telefono'],
             'ciudad' : res.data['ciudad'],
             'urlImagen' : res.data['urlImagen'],
+            'estado' : res.data['estado'],
           };
         });
         Taxista taxista = Taxista.fromJson(data);
@@ -89,6 +90,36 @@ class TaxistaService {
       await _collectionReference
       .document(documentID)
       .updateData({'urlImagen': urlImagen});
+
+      return true;
+    } catch (e) {
+      return e.toString();
+    }
+  }
+
+  Future updateCorreo({
+    @required String documentID, 
+    @required String email,
+  }) async {
+    try {
+      await _collectionReference
+      .document(documentID)
+      .updateData({'email': email});
+
+      return true;
+    } catch (e) {
+      return e.toString();
+    }
+  }
+
+  Future updateCiudad({
+    @required String documentID, 
+    @required String ciudad,
+  }) async {
+    try {
+      await _collectionReference
+      .document(documentID)
+      .updateData({'ciudad': ciudad});
 
       return true;
     } catch (e) {
