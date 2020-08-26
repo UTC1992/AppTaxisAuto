@@ -34,4 +34,19 @@ class SolicitudTaxi {
     'comentario': comentario
   };
 
+   SolicitudTaxi.fromJson(Map<String, dynamic> json)
+      : clienteID = json['idCliente'], 
+        origenDireccion = json['origenDireccion'],
+        origenGPS = {
+          'latitude' : json['origenGPS']['latitude'],
+          'longitude' : json['origenGPS']['longitude'],
+        },
+        destinoDireccion = json['destinoDireccion'],
+        destinoGPS = {
+          'latitude' : json['destinoGPS']['latitude'],
+          'longitude' : json['destinoGPS']['longitude'],
+        },
+        tarifa = json['tarifa'],
+        comentario = json['comentario'];
+
 }
