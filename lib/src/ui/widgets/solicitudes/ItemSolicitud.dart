@@ -1,8 +1,13 @@
+import 'dart:convert';
+
 import 'package:AppTaxisAuto/src/models/Cliente.dart';
 import 'package:AppTaxisAuto/src/models/Rating.dart';
 import 'package:AppTaxisAuto/src/models/SolicitudTaxi.dart';
 import 'package:AppTaxisAuto/src/viewmodel/SolicitudTaxiViewModel.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
+const keyApiGoogle = 'AIzaSyC_CYna_nySeFMtjj--GIJIB6CvHRm0pE4';
 
 class ItemSolicitud extends StatefulWidget {
   
@@ -27,6 +32,7 @@ class _ItemState extends State<ItemSolicitud> {
   int _pedidos = 0;
   int _estrellas = 0;
   String _urlImagenCliente;
+  double _distancia = 0;
 
   _obtenerCliente() async {
     _cliente = await _solicitudTaxiViewModel.getClienteByID(widget.elemento.clienteID);
@@ -62,6 +68,7 @@ class _ItemState extends State<ItemSolicitud> {
     super.initState();
     _obtenerCliente();
     _obtenerRatingCliente();
+    _obtenerDistanciaKM(widget.elemento.origenGPS, widget.elemento.destinoGPS);
   }
   
   @override
@@ -142,7 +149,7 @@ class _ItemState extends State<ItemSolicitud> {
                         ),
                         SizedBox(width: 10,),
                         Icon(Icons.location_on, size: 20, color: Colors.grey,),
-                        Text('2.5 km',
+                        Text('$_distancia km',
                           style: TextStyle(
                             fontSize: 18,
                             color: Colors.grey
@@ -161,4 +168,45 @@ class _ItemState extends State<ItemSolicitud> {
       ),
     );
   }
+
+  _obtenerDistanciaKM(Map origen, Map destino) async {
+
+    String url =  'https://maps.googleapis.com/maps/api/directions/json?'+
+                  'origin='+origen['latitude'].toString()+','
+                  +origen['longitude'].toString()+
+                  '&destination='+destino['latitude'].toString()+','
+                  +destino['longitude'].toString()+
+                  '&language=es&components=country:ec'+
+                  //'&types=(regions)'+
+                  '&key='+keyApiGoogle;
+    
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        //print(response.body);
+        Map<String, dynamic> result = jsonDecode(response.body);
+        //print(result['routes'][0]['legs'][0]['distance']['value']);
+        
+        double distancia = double.parse(
+          result['routes'][0]['legs'][0]['distance']['value'].toString());
+        
+        String kmText = (distancia / 1000).toStringAsFixed(2);
+        double km = double.parse(kmText);
+        //print(km);
+
+        setState(() {
+          _distancia = distancia > 1000 ? 
+                      km : distancia;
+        });
+        
+      } else {
+        // Si esta respuesta no fue OK, lanza un error.
+        throw Exception('fallo la respuesta del servidor');
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+
+  }
+
 }

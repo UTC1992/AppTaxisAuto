@@ -1,3 +1,4 @@
+import 'package:AppTaxisAuto/src/models/SolicitudTaxi.dart';
 import 'package:AppTaxisAuto/src/models/Taxista.dart';
 import 'package:flutter/material.dart';
 import '../ui/view/Landing.dart';
@@ -10,6 +11,7 @@ import '../ui/pages/perfil/EditarImagen.dart';
 import '../ui/pages/perfil/EditarCorreo.dart';
 import '../ui/pages/perfil/EditarPassword.dart';
 import '../ui/pages/perfil/EditarCiudad.dart';
+import '../ui/pages/solicitud/SolicitudDatos.dart';
 import './DrawerNavigation.dart';
 
 class RouteGenerator {
@@ -88,6 +90,17 @@ class RouteGenerator {
         if (args is Taxista) {
           return MaterialPageRoute(
             builder: (_) => EditarCiudad( data: args,),
+          );
+        } 
+        
+        return _errorRoute();
+
+        break;
+      case '/mostrarSolicitud':
+
+        if (args is SolicitudTaxi) {
+          return MaterialPageRoute(
+            builder: (_) => SolicitudDatos( data: args,),
           );
         } 
         

@@ -52,7 +52,8 @@ class _SolicitudState extends State<Solicitudes> {
               itemBuilder: (context, index) {
                 return ItemSolicitud(
                   onPress: () {
-                    print('MOSTRAR SOLICITUD');
+                    Navigator.pushNamed(context, '/mostrarSolicitud',
+                    arguments: _solicitudes[index]);
                   },
                   elemento: _solicitudes[index],
                 );
