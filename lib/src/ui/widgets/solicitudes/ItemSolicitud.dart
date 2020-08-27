@@ -1,4 +1,7 @@
+import 'package:AppTaxisAuto/src/models/Cliente.dart';
+import 'package:AppTaxisAuto/src/models/Rating.dart';
 import 'package:AppTaxisAuto/src/models/SolicitudTaxi.dart';
+import 'package:AppTaxisAuto/src/viewmodel/SolicitudTaxiViewModel.dart';
 import 'package:flutter/material.dart';
 
 class ItemSolicitud extends StatefulWidget {
@@ -17,17 +20,52 @@ class ItemSolicitud extends StatefulWidget {
 
 class _ItemState extends State<ItemSolicitud> {
 
-  
+  SolicitudTaxiViewModel _solicitudTaxiViewModel = SolicitudTaxiViewModel();
+  Cliente _cliente;
+  Rating _rating;
+  String _nombreCliente;
+  int _pedidos = 0;
+  int _estrellas = 0;
+  String _urlImagenCliente;
+
+  _obtenerCliente() async {
+    _cliente = await _solicitudTaxiViewModel.getClienteByID(widget.elemento.clienteID);
+    var nombre = _cliente.nombre.split(' ');
+    setState(() {
+      _nombreCliente = nombre[0];
+      _urlImagenCliente = _cliente.urlImagen;
+    });
+  }
+
+  _obtenerRatingCliente() async {
+    _rating = await _solicitudTaxiViewModel.getRatingCliente(widget.elemento.clienteID);
+    setState(() {
+      _pedidos = _rating.pedidos;
+      _estrellas = _calcularRating();
+    });
+
+  }
+
+  int _calcularRating() {
+    if (_rating.pedidos > 0) {
+      var total = _rating.like + _rating.dislike;
+      var rating = (_rating.like * 5) / total;
+      return rating.toInt();
+    } else {
+      return 0;
+    }
+    
+  }
   
   @override
   void initState() {
     super.initState();
-
+    _obtenerCliente();
+    _obtenerRatingCliente();
   }
   
   @override
   Widget build(BuildContext context) {
-    var screenSize = MediaQuery.of(context).size;
     return GestureDetector(
       onTap: widget.onPress,
       child: Padding(
@@ -45,19 +83,25 @@ class _ItemState extends State<ItemSolicitud> {
                     color: Colors.blue[400]
                   ),
                   child: ClipOval(
-                    child: Image.asset('assets/img/user1.png'),
+                    child: _urlImagenCliente != null ?
+                    Image.network(_urlImagenCliente)
+                    : Image.asset('assets/img/user1.png'),
                   )
                 ),
                 Container(
                   width: 55,
-                  child: Text('Omar', textAlign: TextAlign.center,),
+                  child: Text(
+                    _nombreCliente != null ? 
+                    _nombreCliente : 'Usuario', 
+                    textAlign: TextAlign.center,
+                    ),
                 ),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Icon(Icons.star, color: Colors.yellow[600],),
-                    Text('4'),
-                    Text(' ( 50 )')
+                    Icon(Icons.star, color: Colors.yellow[600], size: 20,),
+                    Text(_estrellas.toString(), style: TextStyle(fontSize: 12),),
+                    Text(' ($_pedidos)', style: TextStyle(fontSize: 12),)
                   ],
                 ),
               ],
