@@ -122,19 +122,31 @@ class _ItemState extends State<ItemSolicitudCliente> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      widget.elemento.origenDireccion, 
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Icon(Icons.location_on, color: Colors.orange[500],),
+                        Text(
+                          widget.elemento.origenDireccion, 
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold
+                            ),
                         ),
+                      ],
                     ),
                     SizedBox(height: 5.0,),
-                    Text(
-                      widget.elemento.destinoDireccion,
-                      style: TextStyle(
-                        fontSize: 14,
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Icon(Icons.location_on, color: Colors.green[500],),
+                        Text(
+                          widget.elemento.destinoDireccion,
+                          style: TextStyle(
+                            fontSize: 14,
+                            ),
                         ),
+                      ]
                     ),
                     SizedBox(height: 5.0,),
                     Row(
