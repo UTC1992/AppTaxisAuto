@@ -8,6 +8,8 @@ import 'package:location/location.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../widgets/solicitudes/ItemSolicitudCliente.dart';
 import '../../widgets/botones/BtnAceptar.dart';
+import '../../widgets/botones/BtnUbicacionCentrar.dart';
+import '../../widgets/botones/BtnBack.dart';
 
 class SolicitudDatos extends StatefulWidget {
   final SolicitudTaxi data;
@@ -75,34 +77,32 @@ class _SolicitudState extends State<SolicitudDatos> {
   ///obtener ubicacion del cliente de la app
   _getUserLocation() async {
     location.getLocation().then((response) {
-
       _locationData = response;
 
       _addMarkersMap('Yo', _locationData.latitude, _locationData.longitude,
-      Colors.blue[700], Icons.drive_eta, '', 80);
-      _addMarkersMap('Cliente', widget.data.origenGPS['latitude'], 
-      widget.data.origenGPS['longitude'],
-      Colors.orange[500], Icons.location_on, '', 60);
-      _addMarkersMap('Destino', widget.data.destinoGPS['latitude'], 
-      widget.data.destinoGPS['longitude'],
-      Colors.green[500], Icons.location_on, '', 60);
+          Colors.blue[700], Icons.drive_eta, '', 80);
+      _addMarkersMap(
+          'Cliente',
+          widget.data.origenGPS['latitude'],
+          widget.data.origenGPS['longitude'],
+          Colors.orange[500],
+          Icons.location_on,
+          '',
+          60);
+      _addMarkersMap(
+          'Destino',
+          widget.data.destinoGPS['latitude'],
+          widget.data.destinoGPS['longitude'],
+          Colors.green[500],
+          Icons.location_on,
+          '',
+          60);
 
       print('latitud' + _locationData.latitude.toString());
       setState(() {
         mostrarMapa = true;
       });
-
     });
-    
-    //_moverCamara(_locationData.latitude, _locationData.longitude);
-    
-  }
-
-  ///mover la camara a las coordenadas indicadas
-  Future<void> _moverCamara(lat, long) async {
-    GoogleMapController controller = await _controllerComplete.future;
-    controller
-        .animateCamera(CameraUpdate.newLatLngZoom(LatLng(lat, long), _zoom));
   }
 
   ///asignar mapa aun controlador
@@ -140,7 +140,7 @@ class _SolicitudState extends State<SolicitudDatos> {
             child: Container(
               //margin: EdgeInsets.only(top: 20),
               width: screenSize.width,
-              height: screenSize.height/2,
+              height: screenSize.height / 2,
               child: !mostrarMapa
                   ? Center(
                       child: CircularProgressIndicator(),
@@ -178,58 +178,82 @@ class _SolicitudState extends State<SolicitudDatos> {
                     elemento: widget.data,
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
-                    child: BtnAceptar(
-                      activo: true,
-                      onPress: () {},
-                      titulo: 'Aceptar por \$' + widget.data.tarifa.toString(),
-                    )
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      child: BtnAceptar(
+                        activo: true,
+                        onPress: () {
+                          _mostrarConfirmacionOferta(widget.data.tarifa);
+                        },
+                        titulo:
+                            'Aceptar por \$' + widget.data.tarifa.toString(),
+                      )),
+                  SizedBox(
+                    height: 10,
                   ),
-                  SizedBox(height: 10,),
-                  Text('Ofrezca su precio del viaje',
+                  Text(
+                    'Ofrezca su precio del viaje',
                     style: TextStyle(fontSize: 18),
                   ),
-                  SizedBox(height: 10,),
+                  SizedBox(
+                    height: 10,
+                  ),
                   Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        BtnAceptar(
-                          activo: true,
-                          onPress: () {},
-                          titulo: '\$ '+(widget.data.tarifa + 0.5).toString(),
-                        ),
-                        BtnAceptar(
-                          activo: true,
-                          onPress: () {},
-                          titulo: '\$ '+(widget.data.tarifa + 1).toString(),
-                        ),
-                        BtnAceptar(
-                          activo: true,
-                          onPress: () {},
-                          titulo: '\$ '+(widget.data.tarifa + 1.5).toString(),
-                        ),
-                      ],
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      BtnAceptar(
+                        activo: true,
+                        onPress: () {},
+                        titulo: '\$ ' + (widget.data.tarifa + 0.5).toString(),
+                      ),
+                      BtnAceptar(
+                        activo: true,
+                        onPress: () {},
+                        titulo: '\$ ' + (widget.data.tarifa + 1).toString(),
+                      ),
+                      BtnAceptar(
+                        activo: true,
+                        onPress: () {},
+                        titulo: '\$ ' + (widget.data.tarifa + 1.5).toString(),
+                      ),
+                    ],
                   ),
                   GestureDetector(
                     onTap: () {
-
+                      Navigator.pop(context);
                     },
                     child: Container(
-                      width: screenSize.width/2,
+                      width: screenSize.width / 2,
                       height: 50,
                       alignment: Alignment.center,
-                      child: Text('Omitir', style: TextStyle(fontSize: 18),),
+                      child: Text(
+                        'Omitir',
+                        style: TextStyle(fontSize: 18),
+                      ),
                     ),
                   )
                 ],
               ),
-            )
-          ),
+            )),
+        BtnUbicacionCentrar(
+          bottom: (screenSize.height / 2) + 10,
+          right: 10,
+          onPress: () async {
+            if (markers.length > 2) {
+              print('CENTRAR MARCADORESSSSS');
+              await updateCameraLocation();
+            }
+          },
+        ),
+        BtnBack(
+            top: 30,
+            left: 10,
+            onPress: () {
+              Navigator.pop(context);
+            }),
       ],
     ));
   }
-
 
   void _addMarkersMap(String idMarker, double lat, double long, Color color,
       icono, String direccion, int width) async {
@@ -246,47 +270,20 @@ class _SolicitudState extends State<SolicitudDatos> {
     setState(() {
       // adding a new marker to map
       markers[markerId] = marker;
-      markerList.add(marker);
+      markerList.add(marker); // lista de marcadores para luego centrar en mapa
     });
 
     if (markers.length > 2) {
       print('CENTRAR MARCADORESSSSS');
-      print(markers.values.elementAt(0).position.latitude);
-      await updateCameraLocation(
-          LatLng(markers.values.elementAt(0).position.latitude,
-              markers.values.elementAt(0).position.longitude),
-          LatLng(markers.values.elementAt(2).position.latitude,
-              markers.values.elementAt(2).position.longitude));
-      
-      
+      await updateCameraLocation();
     }
   }
 
-  Future<void> updateCameraLocation(
-    LatLng source,
-    LatLng destination,
-  ) async {
-    print('COORDENADAS ======================');
-    print(source);
+  Future<void> updateCameraLocation() async {
+    print('CENRANDO MARKERS');
     GoogleMapController mapController = await _controllerComplete.future;
 
     LatLngBounds bounds = getBounds(markerList);
-  
-    /*if (source.latitude > destination.latitude &&
-        source.longitude > destination.longitude) {
-      bounds = LatLngBounds(southwest: destination, northeast: source);
-    } else if (source.longitude > destination.longitude) {
-      bounds = LatLngBounds(
-          southwest: LatLng(source.latitude, destination.longitude),
-          northeast: LatLng(destination.latitude, source.longitude));
-    } else if (source.latitude > destination.latitude) {
-      bounds = LatLngBounds(
-          southwest: LatLng(destination.latitude, source.longitude),
-          northeast: LatLng(source.latitude, destination.longitude));
-    } else {
-      bounds = LatLngBounds(southwest: source, northeast: destination);
-    }
-*/
     //mapController.animateCamera(CameraUpdate.newLatLngBounds(bounds, 100));
 
     CameraUpdate cameraUpdate = CameraUpdate.newLatLngBounds(bounds, 70);
@@ -305,57 +302,15 @@ class _SolicitudState extends State<SolicitudDatos> {
     }
   }
 
-  Future<BitmapDescriptor> crearIconoMarcador(
-    String contenido,
-    Color clusterColor,
-    Color textColor,
-    int width,
-  ) async {
-    final PictureRecorder pictureRecorder = PictureRecorder();
-    final Canvas canvas = Canvas(pictureRecorder);
-    final Paint paint = Paint()..color = clusterColor;
-    final TextPainter textPainter = TextPainter(
-      textDirection: TextDirection.ltr,
-    );
-    final double radius = width / 2;
-    canvas.drawCircle(
-      Offset(radius, radius),
-      radius,
-      paint,
-    );
-    textPainter.text = TextSpan(
-      text: contenido,
-      style: TextStyle(
-        fontSize: radius,
-        fontWeight: FontWeight.bold,
-        color: textColor,
-      ),
-    );
-    textPainter.layout();
-    textPainter.paint(
-      canvas,
-      Offset(
-        radius - textPainter.width / 2,
-        radius - textPainter.height / 2,
-      ),
-    );
-    final image = await pictureRecorder.endRecording().toImage(
-          radius.toInt() * 2,
-          radius.toInt() * 2,
-        );
-    final data = await image.toByteData(format: ImageByteFormat.png);
-    return BitmapDescriptor.fromBytes(data.buffer.asUint8List());
-  }
-
   setPolylines() async {
-   PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-        keyApiGoogle,
-        PointLatLng(widget.data.origenGPS['latitude'], 
-        widget.data.origenGPS['longitude']),
-        PointLatLng(widget.data.destinoGPS['latitude'], 
-        widget.data.destinoGPS['longitude']),
-        travelMode: TravelMode.driving, 
-        );
+    PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+      keyApiGoogle,
+      PointLatLng(widget.data.origenGPS['latitude'],
+          widget.data.origenGPS['longitude']),
+      PointLatLng(widget.data.destinoGPS['latitude'],
+          widget.data.destinoGPS['longitude']),
+      travelMode: TravelMode.driving,
+    );
 
     if (result.points.isNotEmpty) {
       result.points.forEach((PointLatLng point) {
@@ -364,20 +319,19 @@ class _SolicitudState extends State<SolicitudDatos> {
     }
 
     setState(() {
-        // create a Polyline instance
-        // with an id, an RGB color and the list of LatLng pairs
-        Polyline polyline = Polyline(
+      // create a Polyline instance
+      // with an id, an RGB color and the list of LatLng pairs
+      Polyline polyline = Polyline(
           polylineId: PolylineId("poly"),
           color: Colors.blue[600],
           points: polylineCoordinates,
-          width: 4
-        );
-  
-        // add the constructed polyline as a set of points
-        // to the polyline set, which will eventually
-        // end up showing up on the map
-        _polylines.add(polyline);
-      });
+          width: 4);
+
+      // add the constructed polyline as a set of points
+      // to the polyline set, which will eventually
+      // end up showing up on the map
+      _polylines.add(polyline);
+    });
   }
 
   crearIconoMarker(icons, Color color, int width) async {
@@ -385,7 +339,7 @@ class _SolicitudState extends State<SolicitudDatos> {
     final pictureRecorder = PictureRecorder();
     final canvas = Canvas(pictureRecorder);
     final Paint paint = Paint()..color = Colors.white;
-    
+
     final double radius = width / 2;
     canvas.drawCircle(
       Offset(radius, radius),
@@ -398,17 +352,19 @@ class _SolicitudState extends State<SolicitudDatos> {
     textPainter.text = TextSpan(
       text: icosStr,
       style: TextStyle(
-        letterSpacing: 0.0,
-        fontSize: double.parse(width.toString()),
-        fontFamily: iconTaxi.fontFamily,
-        color: color
-      ),
+          letterSpacing: 0.0,
+          fontSize: double.parse(width.toString()) * 0.8,
+          fontFamily: iconTaxi.fontFamily,
+          color: color),
     );
 
     textPainter.layout();
-    textPainter.paint(canvas, Offset(
-      radius - textPainter.width / 2,
-      radius - textPainter.height / 2,));
+    textPainter.paint(
+        canvas,
+        Offset(
+          radius - textPainter.width / 2,
+          radius - textPainter.height / 2,
+        ));
 
     final picture = pictureRecorder.endRecording();
     final image = await picture.toImage(
@@ -417,7 +373,8 @@ class _SolicitudState extends State<SolicitudDatos> {
     );
     final bytes = await image.toByteData(format: ImageByteFormat.png);
 
-    final bitmapDescriptor = BitmapDescriptor.fromBytes(bytes.buffer.asUint8List());
+    final bitmapDescriptor =
+        BitmapDescriptor.fromBytes(bytes.buffer.asUint8List());
 
     return bitmapDescriptor;
   }
@@ -439,6 +396,89 @@ class _SolicitudState extends State<SolicitudDatos> {
     );
 
     return bounds;
-}
+  }
+
+  _mostrarConfirmacionOferta(double tarifa) {
+
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return SimpleDialog(
+          title: Text(
+            '¿Cuánto tiempo le tomará llegar al pasajero?'
+          ),
+
+          children: <Widget>[
+            Container(
+                margin: EdgeInsets.symmetric(horizontal: 10.0),
+                child: SingleChildScrollView(
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        BtnAceptar(
+                          activo: true,
+                          titulo: '3 min.',
+                          onPress: () {
+                            _enviarPropuestaTarifa(tarifa, context);
+                            //Navigator.pushReplacementNamed(context, '/pedidos');
+                          },
+                        ),
+                        SizedBox(height: 10,),
+                        BtnAceptar(
+                          activo: true,
+                          titulo: '5 min.',
+                          onPress: () {
+                            _enviarPropuestaTarifa(tarifa, context);
+                          },
+                        ),
+                        SizedBox(height: 10,),
+                        BtnAceptar(
+                          activo: true,
+                          titulo: '10 min.',
+                          onPress: () {
+                            _enviarPropuestaTarifa(tarifa, context);
+                          },
+                        ),
+                        SizedBox(height: 10,),
+                        BtnAceptar(
+                          activo: true,
+                          titulo: '15 min.',
+                          onPress: () {
+                            _enviarPropuestaTarifa(tarifa, context);
+                          },
+                        ), 
+                        SizedBox(height: 10,),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child: Container(
+                            alignment: Alignment.center,
+                            child: Text(
+                              'Cerrar',
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.grey
+                              ),
+                            ),
+                          ),
+                        )
+                      ]),
+                ),
+            ),
+            
+          ],
+        );
+      },
+    );
+  }
+
+  _enviarPropuestaTarifa(double tarifa, BuildContext context) {
+    print('Enviando propuesta con tarifa => ' + tarifa.toString());
+    //Navigator.pop(context);
+    Navigator.popUntil(context, (route) => route.isFirst);
+  }
 
 }
