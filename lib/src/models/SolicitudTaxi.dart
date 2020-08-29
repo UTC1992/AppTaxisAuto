@@ -7,6 +7,7 @@ class SolicitudTaxi {
   Map destinoGPS;
   double tarifa;
   String comentario;
+  String documentID;
 
   SolicitudTaxi({
     this.clienteID,
@@ -15,7 +16,8 @@ class SolicitudTaxi {
     this.destinoDireccion,
     this.destinoGPS,
     this.tarifa,
-    this.comentario
+    this.comentario,
+    this.documentID
   });
 
   Map<String, dynamic> toMap() => {
@@ -34,8 +36,9 @@ class SolicitudTaxi {
     'comentario': comentario
   };
 
-   SolicitudTaxi.fromJson(Map<String, dynamic> json)
-      : clienteID = json['idCliente'], 
+   SolicitudTaxi.fromJson(Map<String, dynamic> json, String documentoID)
+      : documentID = documentoID,
+        clienteID = json['idCliente'], 
         origenDireccion = json['origenDireccion'],
         origenGPS = {
           'latitude' : json['origenGPS']['latitude'],

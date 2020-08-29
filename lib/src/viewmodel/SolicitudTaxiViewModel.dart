@@ -1,7 +1,7 @@
-import 'package:AppTaxisAuto/src/models/Cliente.dart';
-
+import 'package:flutter/cupertino.dart';
 import '../services/AuthService.dart';
 import '../services/SolicitudTaxiService.dart';
+import '../models/Oferta.dart';
 
 class SolicitudTaxiViewModel extends AuthService{
 
@@ -29,6 +29,21 @@ class SolicitudTaxiViewModel extends AuthService{
       return result;
     } 
     
+  }
+
+  Future addOferta({
+      @required String documentID,
+      @required Oferta oferta
+  }) async {
+    var result = await _solicitudTaxiService.
+    addOferta(documentID: documentID, oferta: oferta);
+
+    if (result is String) {
+      print('Error al añadir oferta ' + result);
+    } else {
+      print('Exito al añadir oferta');
+    }
+
   }
 
 }

@@ -13,10 +13,12 @@ class ItemSolicitudCliente extends StatefulWidget {
   
   ItemSolicitudCliente({
     @required this.elemento, 
-    @required this.onPress
+    @required this.onPress,
+    @required this.taxiGps
   });
 
   final SolicitudTaxi elemento;
+  final Map taxiGps;
   final Function onPress;
 
   @override
@@ -33,6 +35,7 @@ class _ItemState extends State<ItemSolicitudCliente> {
   int _estrellas = 0;
   String _urlImagenCliente;
   double _distancia = 0;
+  String _unidad = 'm';
 
   _obtenerCliente() async {
     _cliente = await _solicitudTaxiViewModel.getClienteByID(widget.elemento.clienteID);
@@ -68,7 +71,9 @@ class _ItemState extends State<ItemSolicitudCliente> {
     super.initState();
     _obtenerCliente();
     _obtenerRatingCliente();
-    _obtenerDistanciaKM(widget.elemento.origenGPS, widget.elemento.destinoGPS);
+    _obtenerDistanciaKM(
+      widget.taxiGps,
+      widget.elemento.origenGPS);
   }
   
   @override
@@ -161,7 +166,7 @@ class _ItemState extends State<ItemSolicitudCliente> {
                         ),
                         SizedBox(width: 10,),
                         Icon(Icons.location_on, size: 20, color: Colors.grey,),
-                        Text('$_distancia km',
+                        Text('$_distancia $_unidad',
                           style: TextStyle(
                             fontSize: 18,
                             color: Colors.grey
@@ -182,6 +187,9 @@ class _ItemState extends State<ItemSolicitudCliente> {
   }
 
   _obtenerDistanciaKM(Map origen, Map destino) async {
+
+    print('ORIGEN COORDENADAS');
+    print(origen['latitude'].toString());
 
     String url =  'https://maps.googleapis.com/maps/api/directions/json?'+
                   'origin='+origen['latitude'].toString()+','
@@ -205,10 +213,12 @@ class _ItemState extends State<ItemSolicitudCliente> {
         String kmText = (distancia / 1000).toStringAsFixed(2);
         double km = double.parse(kmText);
         //print(km);
-
+        
         setState(() {
           _distancia = distancia > 1000 ? 
                       km : distancia;
+          _unidad = distancia > 1000 ? 
+                      'km' : 'm';
         });
         
       } else {

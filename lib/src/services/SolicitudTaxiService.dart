@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'package:AppTaxisAuto/src/models/Cliente.dart';
 import 'package:AppTaxisAuto/src/models/Rating.dart';
+import 'package:flutter/cupertino.dart';
 import '../models/SolicitudTaxi.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../models/Oferta.dart';
 
 class SolicitudTaxiService {
 
@@ -22,7 +24,7 @@ class SolicitudTaxiService {
       .snapshots().listen((result) {
         if(result.documents.isNotEmpty){
           var solicitudes = result.documents
-              .map((snapshot) => SolicitudTaxi.fromJson(snapshot.data))
+              .map((snapshot) => SolicitudTaxi.fromJson(snapshot.data, snapshot.documentID))
               .toList();
 
           _solicitudController.add(solicitudes);
@@ -57,6 +59,21 @@ class SolicitudTaxiService {
 
       Rating rating = Rating.fromJson(data);
       return rating;
+    } catch (e) {
+      return e.toString();
+    }
+  }
+
+  Future addOferta({
+    @required String documentID,
+    @required Oferta oferta 
+  }) async {
+    try {
+      await _collectionSolicitud
+      .document(documentID)
+      .updateData({'ofertas' : oferta.toMap()});
+
+      return true;
     } catch (e) {
       return e.toString();
     }

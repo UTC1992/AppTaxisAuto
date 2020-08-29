@@ -10,6 +10,10 @@ import '../../widgets/solicitudes/ItemSolicitudCliente.dart';
 import '../../widgets/botones/BtnAceptar.dart';
 import '../../widgets/botones/BtnUbicacionCentrar.dart';
 import '../../widgets/botones/BtnBack.dart';
+import '../../../viewmodel/SolicitudTaxiViewModel.dart';
+import '../../../models/Oferta.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:android_intent/android_intent.dart';
 
 class SolicitudDatos extends StatefulWidget {
   final SolicitudTaxi data;
@@ -23,6 +27,10 @@ class SolicitudDatos extends StatefulWidget {
 }
 
 class _SolicitudState extends State<SolicitudDatos> {
+  //solicitud view model
+  SolicitudTaxiViewModel _solicitudTaxiViewModel = new SolicitudTaxiViewModel();
+  Oferta _oferta = new Oferta();
+
   ///variable para obtener ubicacion
   Location location = new Location();
 
@@ -54,23 +62,30 @@ class _SolicitudState extends State<SolicitudDatos> {
   // imagen de markers
   BitmapDescriptor pinLocationIcon;
 
+  //crear otro objeto solicitud
+  Map _taxiGPS;
+
   void setInitialLocation() async {
-    _serviceEnabled = await location.serviceEnabled();
-    if (!_serviceEnabled) {
-      _serviceEnabled = await location.requestService();
+    
+    var isGpsEnabled = await Geolocator().isLocationServiceEnabled();
+    if(!isGpsEnabled) {
+      _serviceEnabled = await location.serviceEnabled();
       if (!_serviceEnabled) {
-        return;
+        _serviceEnabled = await location.requestService();
+        if (!_serviceEnabled) {
+          return;
+        }
+      }
+
+      _permissionGranted = await location.hasPermission();
+      if (_permissionGranted == PermissionStatus.denied) {
+        _permissionGranted = await location.requestPermission();
+        if (_permissionGranted != PermissionStatus.granted) {
+          return;
+        }
       }
     }
-
-    _permissionGranted = await location.hasPermission();
-    if (_permissionGranted == PermissionStatus.denied) {
-      _permissionGranted = await location.requestPermission();
-      if (_permissionGranted != PermissionStatus.granted) {
-        return;
-      }
-    }
-
+    
     await _getUserLocation();
   }
 
@@ -101,6 +116,10 @@ class _SolicitudState extends State<SolicitudDatos> {
       print('latitud' + _locationData.latitude.toString());
       setState(() {
         mostrarMapa = true;
+        _taxiGPS = {
+          'latitude' : _locationData.latitude,
+          'longitude' : _locationData.longitude
+        };
       });
     });
   }
@@ -125,6 +144,36 @@ class _SolicitudState extends State<SolicitudDatos> {
             pinLocationIcon = onValue;
          });
     */
+  }
+  
+
+  Future _checkGps() async {
+    if (!(await Geolocator().isLocationServiceEnabled())) {
+      if (Theme.of(context).platform == TargetPlatform.android) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Can't get gurrent location"),
+              content:
+                  const Text('Please make sure you enable GPS and try again'),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text('Ok'),
+                  onPressed: () {
+                    final AndroidIntent intent = AndroidIntent(
+                        action: 'android.settings.LOCATION_SOURCE_SETTINGS');
+
+                    intent.launch();
+                    Navigator.of(context, rootNavigator: true).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
+    }
   }
 
   @override
@@ -173,9 +222,15 @@ class _SolicitudState extends State<SolicitudDatos> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  _taxiGPS != null ?
                   ItemSolicitudCliente(
                     onPress: () {},
                     elemento: widget.data,
+                    taxiGps: _taxiGPS,
+                  )
+                  : Padding(
+                    padding: EdgeInsets.only(bottom: 30),
+                    child: CircularProgressIndicator(),
                   ),
                   Padding(
                       padding: EdgeInsets.symmetric(horizontal: 20),
@@ -203,17 +258,23 @@ class _SolicitudState extends State<SolicitudDatos> {
                     children: [
                       BtnAceptar(
                         activo: true,
-                        onPress: () {},
+                        onPress: () {
+                          _mostrarConfirmacionOferta(widget.data.tarifa + 0.5);
+                        },
                         titulo: '\$ ' + (widget.data.tarifa + 0.5).toString(),
                       ),
                       BtnAceptar(
                         activo: true,
-                        onPress: () {},
+                        onPress: () {
+                          _mostrarConfirmacionOferta(widget.data.tarifa + 1);
+                        },
                         titulo: '\$ ' + (widget.data.tarifa + 1).toString(),
                       ),
                       BtnAceptar(
                         activo: true,
-                        onPress: () {},
+                        onPress: () {
+                          _mostrarConfirmacionOferta(widget.data.tarifa + 1.5);
+                        },
                         titulo: '\$ ' + (widget.data.tarifa + 1.5).toString(),
                       ),
                     ],
@@ -475,10 +536,16 @@ class _SolicitudState extends State<SolicitudDatos> {
     );
   }
 
-  _enviarPropuestaTarifa(double tarifa, BuildContext context) {
+  _enviarPropuestaTarifa(double tarifa, BuildContext context) async {
     print('Enviando propuesta con tarifa => ' + tarifa.toString());
+
+    await _solicitudTaxiViewModel.addOferta(
+      documentID: widget.data.documentID, 
+      oferta: _oferta);
+    
     //Navigator.pop(context);
     Navigator.popUntil(context, (route) => route.isFirst);
+
   }
 
 }
