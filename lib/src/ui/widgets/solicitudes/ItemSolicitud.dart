@@ -13,11 +13,13 @@ class ItemSolicitud extends StatefulWidget {
   
   ItemSolicitud({
     @required this.elemento, 
-    @required this.onPress
+    @required this.onPress,
+    @required this.taxiGps
   });
 
   final SolicitudTaxi elemento;
   final Function onPress;
+  final Map taxiGps;
 
   @override
   _ItemState createState() => new _ItemState();
@@ -68,7 +70,7 @@ class _ItemState extends State<ItemSolicitud> {
     super.initState();
     _obtenerCliente();
     _obtenerRatingCliente();
-    _obtenerDistanciaKM(widget.elemento.origenGPS, widget.elemento.destinoGPS);
+    _obtenerDistanciaKM(widget.taxiGps, widget.elemento.origenGPS);
   }
   
   @override
@@ -170,6 +172,9 @@ class _ItemState extends State<ItemSolicitud> {
   }
 
   _obtenerDistanciaKM(Map origen, Map destino) async {
+
+    print('ORIGEN COORDENADAS');
+    print(origen['latitude'].toString());
 
     String url =  'https://maps.googleapis.com/maps/api/directions/json?'+
                   'origin='+origen['latitude'].toString()+','

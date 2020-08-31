@@ -14,6 +14,8 @@ class SolicitudTaxiService {
       Firestore.instance.collection('col_cliente');
   final CollectionReference _collectionRating =
       Firestore.instance.collection('col_rating');
+  final CollectionReference _collectionOferta =
+      Firestore.instance.collection('col_oferta');
 
   // Create the controller that will broadcast the posts
   final StreamController<List<SolicitudTaxi>> _solicitudController =
@@ -69,9 +71,8 @@ class SolicitudTaxiService {
     @required Oferta oferta 
   }) async {
     try {
-      await _collectionSolicitud
-      .document(documentID)
-      .updateData({'ofertas' : oferta.toMap()});
+      await _collectionOferta
+      .add(oferta.toMap());
 
       return true;
     } catch (e) {

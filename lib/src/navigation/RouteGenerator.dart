@@ -1,3 +1,4 @@
+import 'package:AppTaxisAuto/src/models/ArgumentosSolicitudDatos.dart';
 import 'package:AppTaxisAuto/src/models/SolicitudTaxi.dart';
 import 'package:AppTaxisAuto/src/models/Taxista.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +18,7 @@ import './DrawerNavigation.dart';
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     // Getting arguments passed in while calling Navigator.pushNamed
-    final args = settings.arguments;
+    final  args = settings.arguments;
 
     switch (settings.name) {
       case '/':
@@ -98,7 +99,7 @@ class RouteGenerator {
         break;
       case '/mostrarSolicitud':
 
-        if (args is SolicitudTaxi) {
+        if (args is ArgumentosSolicitudDatos) {
           return MaterialPageRoute(
             builder: (_) => SolicitudDatos( data: args,),
           );
