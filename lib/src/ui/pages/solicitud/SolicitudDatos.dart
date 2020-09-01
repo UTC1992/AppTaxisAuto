@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
 import 'dart:math';
+import 'package:AppTaxisAuto/src/models/ArgsSolicitudOferta.dart';
 import 'package:AppTaxisAuto/src/models/ArgumentosSolicitudDatos.dart';
 import 'package:AppTaxisAuto/src/models/SolicitudTaxi.dart';
 import 'package:AppTaxisAuto/src/models/Taxista.dart';
@@ -58,6 +59,7 @@ class _SolicitudState extends State<SolicitudDatos> {
   Set<Polyline> _polylines = {};
   // this will hold each polyline coordinate as Lat and Lng pairs
   List<LatLng> polylineCoordinates = [];
+  List<LatLng> polylineCoordinatesTaxi = [];
   // this is the key object - the PolylinePoints
   // which generates every polyline between start and finish
   PolylinePoints polylinePoints = PolylinePoints();
@@ -376,7 +378,7 @@ class _SolicitudState extends State<SolicitudDatos> {
   }
 
   setPolylines() async {
-    PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+    PolylineResult result1 = await polylinePoints.getRouteBetweenCoordinates(
       keyApiGoogle,
       PointLatLng(_solicitudData.origenGPS['latitude'],
           _solicitudData.origenGPS['longitude']),
@@ -385,9 +387,25 @@ class _SolicitudState extends State<SolicitudDatos> {
       travelMode: TravelMode.driving,
     );
 
-    if (result.points.isNotEmpty) {
-      result.points.forEach((PointLatLng point) {
+    PolylineResult result2 = await polylinePoints.getRouteBetweenCoordinates(
+      keyApiGoogle,
+      PointLatLng(_taxiGPS['latitude'],
+          _taxiGPS['longitude']),
+      PointLatLng(_solicitudData.origenGPS['latitude'],
+          _solicitudData.origenGPS['longitude']),
+      travelMode: TravelMode.driving,
+    );
+    
+
+    if (result1.points.isNotEmpty) {
+      result1.points.forEach((PointLatLng point) {
         polylineCoordinates.add(LatLng(point.latitude, point.longitude));
+      });
+    }
+
+    if (result2.points.isNotEmpty) {
+      result2.points.forEach((PointLatLng point) {
+        polylineCoordinatesTaxi.add(LatLng(point.latitude, point.longitude));
       });
     }
 
@@ -395,15 +413,23 @@ class _SolicitudState extends State<SolicitudDatos> {
       // create a Polyline instance
       // with an id, an RGB color and the list of LatLng pairs
       Polyline polyline = Polyline(
-          polylineId: PolylineId("poly"),
+          polylineId: PolylineId("linea1"),
           color: Colors.blue[600],
           points: polylineCoordinates,
-          width: 4);
-
+          width: 5);
+      
+      Polyline polylineTaxi = Polyline(
+          polylineId: PolylineId("linea2"),
+          color: Colors.orange[500],
+          points: polylineCoordinatesTaxi,
+          width: 4,
+          zIndex: 1);
+      
       // add the constructed polyline as a set of points
       // to the polyline set, which will eventually
       // end up showing up on the map
       _polylines.add(polyline);
+      _polylines.add(polylineTaxi);
     });
   }
 
@@ -605,15 +631,27 @@ class _SolicitudState extends State<SolicitudDatos> {
     oferta.tiempo = tiempo;
     oferta.distancia =_distancia.toString() + " " + _unidad;
     oferta.mostrar = true;
+    oferta.aceptada = false;
+    oferta.rechazada = false;
     oferta.idTaxi = _taxista.documentId;
     oferta.idSolicitud = _solicitudData.documentID;
 
 
-    await _solicitudTaxiViewModel.addOferta(
+    var result = await _solicitudTaxiViewModel.addOferta(
       documentID: _solicitudData.documentID, 
       oferta: oferta);
+
+    Oferta ofertaAux = result;
+    
+    print('ID OFERTA => ' + ofertaAux.documentoID);
+
+    ArgsSolicitudOferta argsSolicitudOferta = ArgsSolicitudOferta();
+    argsSolicitudOferta.solicitudTaxi = _solicitudData;
+    argsSolicitudOferta.oferta = ofertaAux;
+
     Navigator.pop(context);
-    Navigator.pop(context, _solicitudData);
+    Navigator.pop(context, argsSolicitudOferta);
+    
     //Navigator.popUntil(context, (route) => route.isFirst);
 
   }

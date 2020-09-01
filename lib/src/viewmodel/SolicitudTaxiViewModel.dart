@@ -42,6 +42,9 @@ class SolicitudTaxiViewModel extends AuthService{
       print('Error al añadir oferta ' + result);
     } else {
       print('Exito al añadir oferta');
+      Oferta ofertaAux = result; 
+      print(ofertaAux.documentoID);
+      return result;
     }
 
   }

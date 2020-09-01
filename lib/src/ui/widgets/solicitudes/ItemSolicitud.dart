@@ -35,6 +35,7 @@ class _ItemState extends State<ItemSolicitud> {
   int _estrellas = 0;
   String _urlImagenCliente;
   double _distancia = 0;
+  String _unidad = 'm';
 
   _obtenerCliente() async {
     _cliente = await _solicitudTaxiViewModel.getClienteByID(widget.elemento.clienteID);
@@ -151,7 +152,7 @@ class _ItemState extends State<ItemSolicitud> {
                         ),
                         SizedBox(width: 10,),
                         Icon(Icons.location_on, size: 20, color: Colors.grey,),
-                        Text('$_distancia km',
+                        Text('$_distancia $_unidad',
                           style: TextStyle(
                             fontSize: 18,
                             color: Colors.grey
@@ -202,6 +203,8 @@ class _ItemState extends State<ItemSolicitud> {
         setState(() {
           _distancia = distancia > 1000 ? 
                       km : distancia;
+          _unidad = distancia > 1000 ? 
+                      'km' : 'm';
         });
         
       } else {

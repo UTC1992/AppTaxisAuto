@@ -20,6 +20,8 @@ class SolicitudTaxiService {
   // Create the controller that will broadcast the posts
   final StreamController<List<SolicitudTaxi>> _solicitudController =
       StreamController<List<SolicitudTaxi>>.broadcast();
+  final StreamController<Oferta> _ofertaController =
+      StreamController<Oferta>.broadcast();
 
   Stream getSolicitudesList() {
       _collectionSolicitud
@@ -71,13 +73,37 @@ class SolicitudTaxiService {
     @required Oferta oferta 
   }) async {
     try {
-      await _collectionOferta
+      var result = await _collectionOferta
       .add(oferta.toMap());
 
-      return true;
+      Oferta ofertaAux = Oferta();
+      ofertaAux.documentoID = result.documentID;
+      print(result.documentID);
+
+      return ofertaAux;
     } catch (e) {
       return e.toString();
     }
   }
+
+  Stream getEstadoOferta({
+    @required String idOferta
+    }) {
+      _collectionOferta
+      .document(idOferta)
+      //.where('aceptada', isEqualTo: false)
+      //.where('rechazada', isEqualTo: false)
+      .snapshots().listen((doc) {
+        if(doc.exists){
+          var oferta = Oferta.fromJson(doc.data, doc.documentID);
+
+          _ofertaController.add(oferta);
+        } else {
+          Oferta _oferta = new Oferta();
+          _ofertaController.add(_oferta);
+        }
+      });
+      return _ofertaController.stream;
+  } 
 
 }
