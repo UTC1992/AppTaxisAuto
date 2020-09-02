@@ -1,5 +1,5 @@
+import 'package:AppTaxisAuto/src/models/ArgsSolicitudOferta.dart';
 import 'package:AppTaxisAuto/src/models/ArgumentosSolicitudDatos.dart';
-import 'package:AppTaxisAuto/src/models/SolicitudTaxi.dart';
 import 'package:AppTaxisAuto/src/models/Taxista.dart';
 import 'package:flutter/material.dart';
 import '../ui/view/Landing.dart';
@@ -13,6 +13,7 @@ import '../ui/pages/perfil/EditarCorreo.dart';
 import '../ui/pages/perfil/EditarPassword.dart';
 import '../ui/pages/perfil/EditarCiudad.dart';
 import '../ui/pages/solicitud/SolicitudDatos.dart';
+import '../ui/pages/procesoViaje/ViajeProceso.dart';
 import './DrawerNavigation.dart';
 
 class RouteGenerator {
@@ -102,6 +103,17 @@ class RouteGenerator {
         if (args is ArgumentosSolicitudDatos) {
           return MaterialPageRoute(
             builder: (_) => SolicitudDatos( data: args,),
+          );
+        } 
+        
+        return _errorRoute();
+
+        break;
+      case '/viajeProceso':
+
+        if (args is ArgsSolicitudOferta) {
+          return MaterialPageRoute(
+            builder: (_) => ViajeProceso( data: args,),
           );
         } 
         

@@ -5,6 +5,7 @@ import 'package:AppTaxisAuto/src/models/Oferta.dart';
 import 'package:AppTaxisAuto/src/models/SolicitudTaxi.dart';
 import 'package:AppTaxisAuto/src/models/Taxista.dart';
 import 'package:AppTaxisAuto/src/services/SolicitudTaxiService.dart';
+import 'package:AppTaxisAuto/src/ui/widgets/botones/BtnAceptar.dart';
 import 'package:AppTaxisAuto/src/ui/widgets/solicitudes/ItemSolicitud.dart';
 import 'package:AppTaxisAuto/src/ui/widgets/solicitudes/ItemSolicitudCliente.dart';
 import 'package:AppTaxisAuto/src/viewmodel/TaxistaViewModel.dart';
@@ -19,9 +20,10 @@ class Solicitudes extends StatefulWidget {
   _SolicitudState createState() => _SolicitudState();
 }
 
-class _SolicitudState extends State<Solicitudes> {
+class _SolicitudState extends State<Solicitudes> with TickerProviderStateMixin {
+  AnimationController controller;
+
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  final GlobalKey<ScaffoldState> _botonCerrarKey = GlobalKey<ScaffoldState>();
 
   final SolicitudTaxiService _solicitudTaxiService = SolicitudTaxiService();
 
@@ -38,10 +40,6 @@ class _SolicitudState extends State<Solicitudes> {
 
   TaxistaViewModel _taxistaViewModel = TaxistaViewModel();
   Taxista taxista;
-
-  //mensaje esperando confirmacion del pasajeo
-  bool cerrarModal;
-  List<Oferta> _ofertasList;
 
   _getUsuarioLogeado() async {
     print('Obtener usuario.............');
@@ -72,7 +70,11 @@ class _SolicitudState extends State<Solicitudes> {
     setInitialLocation();
     _getUsuarioLogeado();
     escucharSolicitudes();
-    cerrarModal = false;
+    controller = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: 30),
+    );
+
     super.initState();
   }
 
@@ -192,144 +194,207 @@ class _SolicitudState extends State<Solicitudes> {
       print(handleError.toString());
     });
     */
+
+    ArgsSolicitudOferta solicitudOfertaAux = data;
+    solicitudOfertaAux.taxista = taxista;
+
+    if (controller.isAnimating)
+      controller.stop();
+    else {
+      controller.reverse(
+          from: controller.value == 0.0 ? 1.0 : controller.value)
+          .then((value){
+            print(controller.value);
+          });
+
+    }
+
     showMaterialModalBottomSheet(
         isDismissible: false,
         enableDrag: false,
         context: _scaffoldKey.currentContext,
         builder: (builder, scrollController) {
           var screenSize = MediaQuery.of(context).size;
-          return StatefulBuilder(
-            builder: (context, setState) {
-              return WillPopScope(
-                  onWillPop: () {},
-                  child: Container(
-                      width: screenSize.width,
-                      height: 300,
-                      child: Column(
-                        children: [
-                          Container(
-                            child: ItemSolicitudCliente(
-                              onPress: () {},
-                              elemento: data.solicitudTaxi,
-                              taxiGps: {
-                                'latitude': _locationData.latitude,
-                                'longitude': _locationData.longitude,
-                              },
-                            ),
-                          ),
-                          SizedBox(
-                            height: 20,
-                          ),
-                          StreamBuilder(
-                            stream: Firestore.instance
-                                .collection("col_oferta")
-                                .document(data.oferta.documentoID)
-                                .snapshots(),
-                            builder: (context, snapshot) {
-                              DocumentSnapshot doc = snapshot.data;
-                              if (doc.exists) {
-                                if (doc.data['rechazada']) {
-                                  return Flex(
-                                    direction: Axis.vertical,
-                                    children: [
-                                      Container(
-                                        width: screenSize.width,
-                                        margin: EdgeInsets.symmetric(
-                                            horizontal: 20),
-                                        alignment: Alignment.center,
-                                        child: Text(
-                                          'La oferta fue rechazada por el pasajero, puede volver a ofertar.',
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                          ),
-                                        ),
-                                      ),
-                                      GestureDetector(
-                                        onTap: () {
-                                          Navigator.pop(context);
-                                        },
-                                        child: Container(
-                                          height: 50,
-                                          alignment: Alignment.center,
-                                          child: Text(
-                                            'Cerrar',
-                                            style: TextStyle(
+          return AnimatedBuilder(
+              animation: controller,
+              builder: (context, child) {
+                return StatefulBuilder(
+                  builder: (context, setState) {
+                    return WillPopScope(
+                        onWillPop: () {},
+                        child: Container(
+                            color: Colors.white,
+                            width: screenSize.width,
+                            height: 250,
+                            child: Column(
+                              children: [
+                                Container(
+                                  child: ItemSolicitudCliente(
+                                    onPress: () {},
+                                    elemento: data.solicitudTaxi,
+                                    taxiGps: {
+                                      'latitude': _locationData.latitude,
+                                      'longitude': _locationData.longitude,
+                                    },
+                                  ),
+                                ),
+                                LinearProgressIndicator(
+                                  backgroundColor: Colors.white,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.green[500],
+                                  ),
+                                  value: controller.value,
+                                ),
+                                SizedBox(
+                                  height: 20,
+                                ),
+                                StreamBuilder(
+                                  stream: Firestore.instance
+                                      .collection("col_oferta")
+                                      .document(data.oferta.documentoID)
+                                      .snapshots(),
+                                  builder: (context, snapshot) {
+                                    DocumentSnapshot doc = snapshot.data;
+                                    if (doc.exists) {
+                                      if (doc.data['rechazada']) {
+                                        return Flex(
+                                          direction: Axis.vertical,
+                                          children: [
+                                            Container(
+                                              width: screenSize.width,
+                                              margin: EdgeInsets.symmetric(
+                                                  horizontal: 20),
+                                              alignment: Alignment.center,
+                                              child: Text(
+                                                'La oferta fue rechazada por el pasajero, puede volver a ofertar.',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  fontSize: 18,
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(height: 20,),
+                                            GestureDetector(
+                                              onTap: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: Container(
+                                                height: 50,
+                                                alignment: Alignment.center,
+                                                child: Text(
+                                                  'Cerrar',
+                                                  style: TextStyle(
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ),
+                                            )
+                                          ],
+                                        );
+                                      } else if (doc.data['aceptada']) {
+                                        
+                                        if (controller.isAnimating) {
+                                          controller.stop();
+                                        }
+
+                                        return Flex(
+                                          direction: Axis.vertical,
+                                          children: [
+                                            Container(
+                                              width: screenSize.width,
+                                              margin: EdgeInsets.symmetric(
+                                                  horizontal: 20),
+                                              alignment: Alignment.center,
+                                              child: Text(
+                                                '¡ Éxito ! Oferta aceptada',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(height: 20,),
+                                            Padding(
+                                              padding: EdgeInsets.symmetric(horizontal: 40),
+                                              child: BtnAceptar(
+                                                activo: true,
+                                                titulo: 'Empezar',
+                                                onPress: () {
+                                                  Navigator.pop(context);
+                                                  Navigator.pushNamed(context, '/viajeProceso',
+                                                    arguments: solicitudOfertaAux);
+                                                },
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      } else {
+                                        return Flex(
+                                          direction: Axis.vertical,
+                                          children: [
+                                            SizedBox(height: 20,),
+                                            Container(
+                                              width: screenSize.width,
+                                              margin: EdgeInsets.symmetric(
+                                                  horizontal: 20),
+                                              alignment: Alignment.center,
+                                              child: Text(
+                                                'Ofreciendo su tarifa espere la respuesta del pasajero...',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  fontSize: 18,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      }
+                                    } else {
+                                      return Flex(
+                                        direction: Axis.vertical,
+                                        children: [
+                                          Container(
+                                            width: screenSize.width,
+                                            margin: EdgeInsets.symmetric(
+                                                horizontal: 20),
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              'La oferta fue rechazada por el pasajero, puede volver a ofertar.',
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
                                                 fontSize: 18,
-                                                fontWeight: FontWeight.bold),
+                                              ),
+                                            ),
                                           ),
-                                        ),
-                                      )
-                                    ],
-                                  );
-                                } else {
-                                  return Flex(
-                                    direction: Axis.vertical,
-                                    children: [
-                                      Container(
-                                        width: screenSize.width,
-                                        margin: EdgeInsets.symmetric(
-                                            horizontal: 20),
-                                        alignment: Alignment.center,
-                                        child: Text(
-                                          'Ofreciendo su tarifa espere la respuesta del pasajero...',
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 10,
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.all(10.0),
-                                        child: CircularProgressIndicator(),
-                                      ),
-                                    ],
-                                  );
-                                }
-                              } else {
-                                return Flex(
-                                  direction: Axis.vertical,
-                                  children: [
-                                    Container(
-                                      width: screenSize.width,
-                                      margin:
-                                          EdgeInsets.symmetric(horizontal: 20),
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        'La oferta fue rechazada por el pasajero, puede volver a ofertar.',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                        ),
-                                      ),
-                                    ),
-                                    GestureDetector(
-                                      onTap: () {
-                                        Navigator.pop(context);
-                                      },
-                                      child: Container(
-                                        height: 50,
-                                        alignment: Alignment.center,
-                                        child: Text(
-                                          'Cerrar',
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                );
-                              }
-                            },
-                          ),
-                        ],
-                      )));
-            },
-          );
+                                          SizedBox(height: 20,),
+                                          GestureDetector(
+                                            onTap: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: Container(
+                                              height: 50,
+                                              alignment: Alignment.center,
+                                              child: Text(
+                                                'Cerrar',
+                                                style: TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      );
+                                    }
+                                  },
+                                ),
+                              ],
+                            )));
+                  },
+                );
+              });
         });
   }
 }

@@ -1,39 +1,35 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:ui';
 import 'dart:math';
 import 'package:AppTaxisAuto/src/models/ArgsSolicitudOferta.dart';
-import 'package:AppTaxisAuto/src/models/ArgumentosSolicitudDatos.dart';
 import 'package:AppTaxisAuto/src/models/SolicitudTaxi.dart';
 import 'package:AppTaxisAuto/src/models/Taxista.dart';
+import 'package:AppTaxisAuto/src/ui/widgets/solicitudes/ItemSolicitudProceso.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:location/location.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import '../../widgets/solicitudes/ItemSolicitudCliente.dart';
 import '../../widgets/botones/BtnAceptar.dart';
 import '../../widgets/botones/BtnUbicacionCentrar.dart';
-import '../../widgets/botones/BtnBack.dart';
 import '../../../viewmodel/SolicitudTaxiViewModel.dart';
-import '../../../models/Oferta.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:android_intent/android_intent.dart';
-import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 
 const keyApiGoogle = "AIzaSyC_CYna_nySeFMtjj--GIJIB6CvHRm0pE4";
 
-class SolicitudDatos extends StatefulWidget {
-  final ArgumentosSolicitudDatos data;
+class ViajeProceso extends StatefulWidget {
+  final ArgsSolicitudOferta data;
 
-  SolicitudDatos({
+  ViajeProceso({
     Key key,
     @required this.data,
   }) : super(key: key);
 
-  _SolicitudState createState() => _SolicitudState();
+  @override
+  _StateViajeProceso createState() => _StateViajeProceso();
 }
 
-class _SolicitudState extends State<SolicitudDatos> {
+class _StateViajeProceso extends State<ViajeProceso> {
   //solicitud view model
   SolicitudTaxiViewModel _solicitudTaxiViewModel = new SolicitudTaxiViewModel();
 
@@ -71,16 +67,13 @@ class _SolicitudState extends State<SolicitudDatos> {
 
   //crear otro objeto solicitud
   Map _taxiGPS;
-  double _distancia;
-  String _unidad;
 
   SolicitudTaxi _solicitudData;
   Taxista _taxista;
 
   void setInitialLocation() async {
-    
     var isGpsEnabled = await Geolocator().isLocationServiceEnabled();
-    if(!isGpsEnabled) {
+    if (!isGpsEnabled) {
       _serviceEnabled = await location.serviceEnabled();
       if (!_serviceEnabled) {
         _serviceEnabled = await location.requestService();
@@ -97,7 +90,7 @@ class _SolicitudState extends State<SolicitudDatos> {
         }
       }
     }
-    
+
     await _getUserLocation();
   }
 
@@ -129,12 +122,10 @@ class _SolicitudState extends State<SolicitudDatos> {
       setState(() {
         mostrarMapa = true;
         _taxiGPS = {
-          'latitude' : _locationData.latitude,
-          'longitude' : _locationData.longitude
+          'latitude': _locationData.latitude,
+          'longitude': _locationData.longitude
         };
       });
-
-      _obtenerDistanciaKM(_taxiGPS, _solicitudData.origenGPS);
     });
   }
 
@@ -161,42 +152,33 @@ class _SolicitudState extends State<SolicitudDatos> {
          });
     */
   }
-  
-
-  Future _checkGps() async {
-    if (!(await Geolocator().isLocationServiceEnabled())) {
-      if (Theme.of(context).platform == TargetPlatform.android) {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text("Can't get gurrent location"),
-              content:
-                  const Text('Please make sure you enable GPS and try again'),
-              actions: <Widget>[
-                FlatButton(
-                  child: Text('Ok'),
-                  onPressed: () {
-                    final AndroidIntent intent = AndroidIntent(
-                        action: 'android.settings.LOCATION_SOURCE_SETTINGS');
-
-                    intent.launch();
-                    Navigator.of(context, rootNavigator: true).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        );
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
-    var screenSize = MediaQuery.of(context).size;
     return Scaffold(
-        body: Stack(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        actions: [
+          GestureDetector(
+            onTap: () {},
+            child: Container(
+              width: 100,
+              alignment: Alignment.center,
+              child: Text(
+                'Cancelar',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+        ],
+      ),
+      body: getProcesoViaje(context),
+    );
+  }
+
+  Widget getProcesoViaje(context) {
+    var screenSize = MediaQuery.of(context).size;
+    return Stack(
       children: [
         Positioned(
           top: 0,
@@ -205,7 +187,7 @@ class _SolicitudState extends State<SolicitudDatos> {
             child: Container(
               //margin: EdgeInsets.only(top: 20),
               width: screenSize.width,
-              height: screenSize.height / 2,
+              height: screenSize.height / 1.75,
               child: !mostrarMapa
                   ? Center(
                       child: CircularProgressIndicator(),
@@ -234,86 +216,33 @@ class _SolicitudState extends State<SolicitudDatos> {
         Positioned(
             bottom: 0,
             child: Container(
+              color: Colors.white,
               width: screenSize.width,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  _taxiGPS != null ?
-                  ItemSolicitudCliente(
-                    onPress: () {},
-                    elemento: _solicitudData,
-                    taxiGps: _taxiGPS,
-                  )
-                  : Padding(
-                    padding: EdgeInsets.only(bottom: 30),
-                    child: CircularProgressIndicator(),
-                  ),
-                  Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      child: BtnAceptar(
-                        activo: true,
-                        onPress: () {
-                          _mostrarConfirmacionOferta(_solicitudData.tarifa);
-                        },
-                        titulo:
-                            'Aceptar por \$' + _solicitudData.tarifa.toString(),
-                      )),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Text(
-                    'Ofrezca su precio del viaje',
-                    style: TextStyle(fontSize: 18),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      BtnAceptar(
-                        activo: true,
-                        onPress: () {
-                          _mostrarConfirmacionOferta(_solicitudData.tarifa + 0.5);
-                        },
-                        titulo: '\$ ' + (_solicitudData.tarifa + 0.5).toString(),
-                      ),
-                      BtnAceptar(
-                        activo: true,
-                        onPress: () {
-                          _mostrarConfirmacionOferta(_solicitudData.tarifa + 1);
-                        },
-                        titulo: '\$ ' + (_solicitudData.tarifa + 1).toString(),
-                      ),
-                      BtnAceptar(
-                        activo: true,
-                        onPress: () {
-                          _mostrarConfirmacionOferta(_solicitudData.tarifa + 1.5);
-                        },
-                        titulo: '\$ ' + (_solicitudData.tarifa + 1.5).toString(),
-                      ),
-                    ],
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context);
+                  ItemSolicitudProceso(
+                    onPress: (){
+                      String _phone = '0979298483';
+                      _llamarAlTelefonoCliente('tel://$_phone');
                     },
-                    child: Container(
-                      width: screenSize.width / 2,
-                      height: 50,
-                      alignment: Alignment.center,
-                      child: Text(
-                        'Omitir',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                    ),
-                  )
+                    elemento: widget.data.solicitudTaxi,
+                  ),
+                  SizedBox(height: 10,),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: BtnAceptar(
+                      activo: true,
+                      onPress: () {},
+                      titulo: 'He llegado',
+                    )
+                  ),
+                  SizedBox(height: 10,)
                 ],
               ),
             )),
         BtnUbicacionCentrar(
-          bottom: (screenSize.height / 2) + 10,
+          bottom: (screenSize.height / 3),
           right: 10,
           onPress: () async {
             if (markers.length > 2) {
@@ -322,14 +251,8 @@ class _SolicitudState extends State<SolicitudDatos> {
             }
           },
         ),
-        BtnBack(
-            top: 30,
-            left: 10,
-            onPress: () {
-              Navigator.pop(context);
-            }),
       ],
-    ));
+    );
   }
 
   void _addMarkersMap(String idMarker, double lat, double long, Color color,
@@ -391,13 +314,11 @@ class _SolicitudState extends State<SolicitudDatos> {
 
     PolylineResult result2 = await polylinePoints.getRouteBetweenCoordinates(
       keyApiGoogle,
-      PointLatLng(_taxiGPS['latitude'],
-          _taxiGPS['longitude']),
+      PointLatLng(_taxiGPS['latitude'], _taxiGPS['longitude']),
       PointLatLng(_solicitudData.origenGPS['latitude'],
           _solicitudData.origenGPS['longitude']),
       travelMode: TravelMode.driving,
     );
-    
 
     if (result1.points.isNotEmpty) {
       result1.points.forEach((PointLatLng point) {
@@ -419,14 +340,14 @@ class _SolicitudState extends State<SolicitudDatos> {
           color: Colors.blue[600],
           points: polylineCoordinates,
           width: 5);
-      
+
       Polyline polylineTaxi = Polyline(
           polylineId: PolylineId("linea2"),
           color: Colors.orange[500],
           points: polylineCoordinatesTaxi,
           width: 4,
           zIndex: 1);
-      
+
       // add the constructed polyline as a set of points
       // to the polyline set, which will eventually
       // end up showing up on the map
@@ -499,163 +420,12 @@ class _SolicitudState extends State<SolicitudDatos> {
     return bounds;
   }
 
-  _mostrarConfirmacionOferta(double tarifa) {
-
-    // flutter defined function
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        // return object of type Dialog
-        return SimpleDialog(
-          title: Text(
-            '¿Cuánto tiempo le tomará llegar al pasajero?'
-          ),
-
-          children: <Widget>[
-            Container(
-                margin: EdgeInsets.symmetric(horizontal: 10.0),
-                child: SingleChildScrollView(
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        BtnAceptar(
-                          activo: true,
-                          titulo: '3 min.',
-                          onPress: () {
-                            int tiempo = 3;
-                            _enviarPropuestaTarifa(context, tarifa, tiempo);
-                            //Navigator.pushReplacementNamed(context, '/pedidos');
-                          },
-                        ),
-                        SizedBox(height: 10,),
-                        BtnAceptar(
-                          activo: true,
-                          titulo: '5 min.',
-                          onPress: () {
-                            int tiempo = 5;
-                            _enviarPropuestaTarifa(context, tarifa, tiempo);
-                          },
-                        ),
-                        SizedBox(height: 10,),
-                        BtnAceptar(
-                          activo: true,
-                          titulo: '10 min.',
-                          onPress: () {
-                            int tiempo = 10;
-                            _enviarPropuestaTarifa(context, tarifa, tiempo);
-                          },
-                        ),
-                        SizedBox(height: 10,),
-                        BtnAceptar(
-                          activo: true,
-                          titulo: '15 min.',
-                          onPress: () {
-                            int tiempo = 15;
-                            _enviarPropuestaTarifa(context, tarifa, tiempo);
-                          },
-                        ), 
-                        SizedBox(height: 10,),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                          child: Container(
-                            alignment: Alignment.center,
-                            child: Text(
-                              'Cerrar',
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.grey
-                              ),
-                            ),
-                          ),
-                        )
-                      ]),
-                ),
-            ),
-            
-          ],
-        );
-      },
-    );
-  }
-
-  _obtenerDistanciaKM(Map origen, Map destino) async {
-
-    print('ORIGEN COORDENADAS');
-    print(origen['latitude'].toString());
-
-    String url =  'https://maps.googleapis.com/maps/api/directions/json?'+
-                  'origin='+origen['latitude'].toString()+','
-                  +origen['longitude'].toString()+
-                  '&destination='+destino['latitude'].toString()+','
-                  +destino['longitude'].toString()+
-                  '&language=es&components=country:ec'+
-                  //'&types=(regions)'+
-                  '&key='+keyApiGoogle;
-    
-    try {
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        //print(response.body);
-        Map<String, dynamic> result = jsonDecode(response.body);
-        //print(result['routes'][0]['legs'][0]['distance']['value']);
-        
-        double distancia = double.parse(
-          result['routes'][0]['legs'][0]['distance']['value'].toString());
-        
-        String kmText = (distancia / 1000).toStringAsFixed(2);
-        double km = double.parse(kmText);
-        //print(km);
-        
-        setState(() {
-          _distancia = distancia > 1000 ? 
-                      km : distancia;
-          _unidad = distancia > 1000 ? 
-                      'km' : 'm';
-        });
-        
-      } else {
-        // Si esta respuesta no fue OK, lanza un error.
-        throw Exception('fallo la respuesta del servidor');
-      }
-    } catch (e) {
-      print(e.toString());
+  Future<void> _llamarAlTelefonoCliente(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
     }
-
-  }
-
-  _enviarPropuestaTarifa(BuildContext context, double tarifa, int tiempo) async {
-    print('Enviando propuesta con tarifa => ' + tarifa.toString());
-    
-    Oferta oferta = new Oferta();
-    oferta.tarifa = tarifa;
-    oferta.tiempo = tiempo;
-    oferta.distancia =_distancia.toString() + " " + _unidad;
-    oferta.mostrar = true;
-    oferta.aceptada = false;
-    oferta.rechazada = false;
-    oferta.idTaxi = _taxista.documentId;
-    oferta.idSolicitud = _solicitudData.documentID;
-
-
-    var result = await _solicitudTaxiViewModel.addOferta(
-      documentID: _solicitudData.documentID, 
-      oferta: oferta);
-
-    Oferta ofertaAux = result;
-    
-    print('ID OFERTA => ' + ofertaAux.documentoID);
-
-    ArgsSolicitudOferta argsSolicitudOferta = ArgsSolicitudOferta();
-    argsSolicitudOferta.solicitudTaxi = _solicitudData;
-    argsSolicitudOferta.oferta = ofertaAux;
-
-    Navigator.pop(context);
-    Navigator.pop(context, argsSolicitudOferta);
-    
-    //Navigator.popUntil(context, (route) => route.isFirst);
-
   }
 
 }
