@@ -114,7 +114,7 @@ class _SolicitudState extends State<SolicitudDatos> {
           _solicitudData.origenGPS['longitude'],
           Colors.orange[500],
           Icons.location_on,
-          '',
+          _solicitudData.origenDireccion,
           60);
       _addMarkersMap(
           'Destino',
@@ -122,7 +122,7 @@ class _SolicitudState extends State<SolicitudDatos> {
           _solicitudData.destinoGPS['longitude'],
           Colors.green[500],
           Icons.location_on,
-          '',
+          _solicitudData.destinoDireccion,
           60);
 
       print('latitud' + _locationData.latitude.toString());
@@ -439,7 +439,7 @@ class _SolicitudState extends State<SolicitudDatos> {
     final iconTaxi = icons;
     final pictureRecorder = PictureRecorder();
     final canvas = Canvas(pictureRecorder);
-    final Paint paint = Paint()..color = Colors.white;
+    final Paint paint = Paint()..color = Color.fromRGBO(100, 100, 100, 0.2);
 
     final double radius = width / 2;
     canvas.drawCircle(
