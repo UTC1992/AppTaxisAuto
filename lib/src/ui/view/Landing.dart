@@ -10,11 +10,11 @@ class Landing extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     AuthService authFirebase = Provider.of<AuthService>(context);
-    return StreamBuilder<FirebaseUser>(
+    return StreamBuilder<User>(
           stream: authFirebase.onAuthStateChanged,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.active) {
-              FirebaseUser user = snapshot.data;
+              User user = snapshot.data;
               if(user == null) {
                 return Bienvenida();
               } else {

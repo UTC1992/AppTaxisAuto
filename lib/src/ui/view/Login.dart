@@ -133,6 +133,7 @@ class _FormLoginState extends State<FormLogin> {
                                             return null;
                                           },
                                           onChanged: (String value) => userAuth.email = value,
+                                          keyboardType: TextInputType.emailAddress,
                                         ),
                                       ),
                                       Container(

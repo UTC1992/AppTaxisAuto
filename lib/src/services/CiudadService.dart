@@ -5,16 +5,16 @@ import '../models/Ciudad.dart';
 
 class CiudadService {
   final CollectionReference _collectionReference =
-      Firestore.instance.collection('col_ciudad');
+      FirebaseFirestore.instance.collection('col_ciudad');
 
   Future getCiudadAll() async {
     try {
-      var ciudadList = await _collectionReference.getDocuments();
-      if(ciudadList.documents.isNotEmpty) {
-        return  ciudadList.documents
+      var ciudadList = await _collectionReference.get();
+      if(ciudadList.docs.isNotEmpty) {
+        return  ciudadList.docs
                 .map((snapshot) => Ciudad.fromJson({
-                  'id': snapshot.documentID,
-                  'nombre' : snapshot.data['nombre']}))
+                  'id': snapshot.id,
+                  'nombre' : snapshot.data()['nombre']}))
                 .toList();
       }
     } catch (e) {

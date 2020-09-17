@@ -14,8 +14,8 @@ class Rating {
     this.pedidos
   });
 
-  Rating.fromJson(Map<String, dynamic> json)
-      : documentoID = json['id'],
+  Rating.fromJson(Map<String, dynamic> json, String documentoID)
+      : documentoID = documentoID,
         idCliente = json['idCliente'], 
         like = json['like'],
         dislike = json['dislike'],

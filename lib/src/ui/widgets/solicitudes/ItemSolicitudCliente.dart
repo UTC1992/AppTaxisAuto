@@ -132,7 +132,7 @@ class _ItemState extends State<ItemSolicitudCliente> {
                       children: [
                         Icon(Icons.location_on, color: Colors.orange[500],),
                         Text(
-                          widget.elemento.origenDireccion, 
+                          widget.elemento.origenDireccion.split(',')[0], 
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold
@@ -146,7 +146,7 @@ class _ItemState extends State<ItemSolicitudCliente> {
                       children: [
                         Icon(Icons.location_on, color: Colors.green[500],),
                         Text(
-                          widget.elemento.destinoDireccion,
+                          widget.elemento.destinoDireccion.split(',')[0],
                           style: TextStyle(
                             fontSize: 14,
                             ),

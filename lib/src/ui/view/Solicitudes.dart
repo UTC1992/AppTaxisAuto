@@ -43,7 +43,7 @@ class _SolicitudState extends State<Solicitudes> with TickerProviderStateMixin {
 
   _getUsuarioLogeado() async {
     print('Obtener usuario.............');
-    FirebaseUser user = await _taxistaViewModel.getTaxistaLogeado();
+    User user = await _taxistaViewModel.getTaxistaLogeado();
     if (user != null) {
       _taxistaViewModel.getTaxistaByEmail(user.email).listen((event) {
         setState(() {
@@ -249,14 +249,14 @@ class _SolicitudState extends State<Solicitudes> with TickerProviderStateMixin {
                                   height: 20,
                                 ),
                                 StreamBuilder(
-                                  stream: Firestore.instance
+                                  stream: FirebaseFirestore.instance
                                       .collection("col_oferta")
-                                      .document(data.oferta.documentoID)
+                                      .doc(data.oferta.documentoID)
                                       .snapshots(),
                                   builder: (context, snapshot) {
                                     DocumentSnapshot doc = snapshot.data;
-                                    if (doc.exists) {
-                                      if (doc.data['rechazada']) {
+                                    if (doc != null) {
+                                      if (doc.data()['rechazada']) {
                                         return Flex(
                                           direction: Axis.vertical,
                                           children: [
@@ -292,7 +292,7 @@ class _SolicitudState extends State<Solicitudes> with TickerProviderStateMixin {
                                             )
                                           ],
                                         );
-                                      } else if (doc.data['aceptada']) {
+                                      } else if (doc.data()['aceptada']) {
                                         
                                         if (controller.isAnimating) {
                                           controller.stop();

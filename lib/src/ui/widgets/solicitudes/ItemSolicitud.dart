@@ -126,7 +126,7 @@ class _ItemState extends State<ItemSolicitud> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.elemento.origenDireccion, 
+                      widget.elemento.origenDireccion.split(',')[0], 
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold
@@ -134,7 +134,7 @@ class _ItemState extends State<ItemSolicitud> {
                     ),
                     SizedBox(height: 5.0,),
                     Text(
-                      widget.elemento.destinoDireccion,
+                      widget.elemento.destinoDireccion.split(',')[0],
                       style: TextStyle(
                         fontSize: 14,
                         ),

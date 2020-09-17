@@ -117,7 +117,7 @@ class _ItemState extends State<ItemSolicitudProceso> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.elemento.origenDireccion, 
+                      widget.elemento.origenDireccion.split(',')[0], 
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold
@@ -125,7 +125,7 @@ class _ItemState extends State<ItemSolicitudProceso> {
                     ),
                     SizedBox(height: 5.0,),
                     Text(
-                      widget.elemento.destinoDireccion,
+                      widget.elemento.destinoDireccion.split(',')[0],
                       style: TextStyle(
                         fontSize: 14,
                         ),
@@ -134,11 +134,11 @@ class _ItemState extends State<ItemSolicitudProceso> {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Icon(Icons.monetization_on, size: 20, color: Colors.red[900],),
+                        Icon(Icons.monetization_on, size: 20, color: Colors.green[500],),
                         Text(widget.elemento.tarifa.toString(),
                           style: TextStyle(
                             fontSize: 18,
-                            color: Colors.red[900]
+                            color: Colors.green[500]
                           ),
                         ),
                         

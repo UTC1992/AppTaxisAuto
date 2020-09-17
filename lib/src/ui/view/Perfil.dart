@@ -14,7 +14,7 @@ class _PerfilState extends State<Perfil> {
 
   _getUsuarioLogeado() async {
     print('Obtener usuario.............');
-    FirebaseUser user = await _taxistaViewModel.getTaxistaLogeado();
+    User user = await _taxistaViewModel.getTaxistaLogeado();
     if (user != null) {
       _taxistaViewModel.getTaxistaByEmail(user.email).listen((event) {
         setState(() {

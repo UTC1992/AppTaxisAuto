@@ -28,8 +28,8 @@ class Taxista {
     'urlImagen':'',
   };
 
-  Taxista.fromJson(Map<String, dynamic> json)
-      : documentId = json['id'], 
+  Taxista.fromJson(Map<String, dynamic> json, String documentoID)
+      : documentId = documentoID, 
         nombre = json['nombre'],
         email = json['email'],
         cedula = json['cedula'],

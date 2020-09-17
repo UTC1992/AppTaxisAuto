@@ -439,7 +439,8 @@ class _SolicitudState extends State<SolicitudDatos> {
     final iconTaxi = icons;
     final pictureRecorder = PictureRecorder();
     final canvas = Canvas(pictureRecorder);
-    final Paint paint = Paint()..color = Color.fromRGBO(100, 100, 100, 0.2);
+    //final Paint paint = Paint()..color = Color.fromRGBO(100, 100, 100, 0.2);
+    final Paint paint = Paint()..color = Colors.white;
 
     final double radius = width / 2;
     canvas.drawCircle(

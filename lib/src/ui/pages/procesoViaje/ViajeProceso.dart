@@ -172,7 +172,12 @@ class _StateViajeProceso extends State<ViajeProceso> {
           ),
         ],
       ),
-      body: getProcesoViaje(context),
+      body: Container(
+        decoration: BoxDecoration(
+          color: Colors.white
+        ),
+        child: getProcesoViaje(context),
+      )
     );
   }
 
@@ -187,7 +192,7 @@ class _StateViajeProceso extends State<ViajeProceso> {
             child: Container(
               //margin: EdgeInsets.only(top: 20),
               width: screenSize.width,
-              height: screenSize.height / 1.75,
+              height: screenSize.height / 2.0,
               child: !mostrarMapa
                   ? Center(
                       child: CircularProgressIndicator(),
@@ -221,6 +226,25 @@ class _StateViajeProceso extends State<ViajeProceso> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  SizedBox(height: 10,),
+                  GestureDetector(
+                    onTap: () {},
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                          
+                          Text('Mostrar ruta', 
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.green[500]
+                            ),
+                          ),
+                          SizedBox(width: 10,),
+                          Icon(Icons.chevron_right, color: Colors.green[500],)
+                      ],
+                    ),
+                  ),
                   ItemSolicitudProceso(
                     onPress: (){
                       String _phone = '0979298483';
@@ -240,9 +264,10 @@ class _StateViajeProceso extends State<ViajeProceso> {
                   SizedBox(height: 10,)
                 ],
               ),
-            )),
+            )
+        ),
         BtnUbicacionCentrar(
-          bottom: (screenSize.height / 3),
+          bottom: (screenSize.height / 2.5),
           right: 10,
           onPress: () async {
             if (markers.length > 2) {

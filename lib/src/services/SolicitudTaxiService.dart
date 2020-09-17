@@ -9,13 +9,13 @@ import '../models/Oferta.dart';
 class SolicitudTaxiService {
 
   final CollectionReference _collectionSolicitud =
-      Firestore.instance.collection('col_solicitud_taxi');
+      FirebaseFirestore.instance.collection('col_solicitud_taxi');
   final CollectionReference _collectionCliente =
-      Firestore.instance.collection('col_cliente');
+      FirebaseFirestore.instance.collection('col_cliente');
   final CollectionReference _collectionRating =
-      Firestore.instance.collection('col_rating');
+      FirebaseFirestore.instance.collection('col_rating');
   final CollectionReference _collectionOferta =
-      Firestore.instance.collection('col_oferta');
+      FirebaseFirestore.instance.collection('col_oferta');
 
   // Create the controller that will broadcast the posts
   final StreamController<List<SolicitudTaxi>> _solicitudController =
@@ -26,9 +26,9 @@ class SolicitudTaxiService {
   Stream getSolicitudesList() {
       _collectionSolicitud
       .snapshots().listen((result) {
-        if(result.documents.isNotEmpty){
-          var solicitudes = result.documents
-              .map((snapshot) => SolicitudTaxi.fromJson(snapshot.data, snapshot.documentID))
+        if(result.docs.isNotEmpty){
+          var solicitudes = result.docs
+              .map((snapshot) => SolicitudTaxi.fromJson(snapshot.data(), snapshot.id))
               .toList();
 
           _solicitudController.add(solicitudes);
@@ -39,29 +39,31 @@ class SolicitudTaxiService {
 
   Future getClienteByID(String id) async {
     try {
-      var result = await _collectionCliente.document(id).get();
+      var result = await _collectionCliente.doc(id).get();
       //print(result.data);
-      Cliente cliente = Cliente.fromJson(result.data);
+      Cliente cliente = Cliente.fromJson(result.data(), result.id);
       return cliente;
     } catch (e) {
       return e.toString();
     }
   }
 
-  Future getRatingCliente(String id) async {
+  Future getRatingCliente(String documentoID) async {
     try {
       var result = await _collectionRating
-      .where('idCliente', isEqualTo: id)
-      .getDocuments();
+      .where('idCliente', isEqualTo: documentoID)
+      .get();
       
       var data;
+      var id;
 
-      result.documents.forEach((doc) {
+      result.docs.forEach((doc) {
         //print(doc.data);
-        data = doc.data;
+        data = doc.data();
+        id = doc.id;
       });
 
-      Rating rating = Rating.fromJson(data);
+      Rating rating = Rating.fromJson(data, id);
       return rating;
     } catch (e) {
       return e.toString();
@@ -77,8 +79,8 @@ class SolicitudTaxiService {
       .add(oferta.toMap());
 
       Oferta ofertaAux = Oferta();
-      ofertaAux.documentoID = result.documentID;
-      print(result.documentID);
+      ofertaAux.documentoID = result.id;
+      print(result.id);
 
       return ofertaAux;
     } catch (e) {
@@ -90,12 +92,12 @@ class SolicitudTaxiService {
     @required String idOferta
     }) {
       _collectionOferta
-      .document(idOferta)
+      .doc(idOferta)
       //.where('aceptada', isEqualTo: false)
       //.where('rechazada', isEqualTo: false)
       .snapshots().listen((doc) {
         if(doc.exists){
-          var oferta = Oferta.fromJson(doc.data, doc.documentID);
+          var oferta = Oferta.fromJson(doc.data(), doc.id);
 
           _ofertaController.add(oferta);
         } else {

@@ -5,11 +5,11 @@ class AuthService extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // create a getter stream
-  Stream<FirebaseUser> get onAuthStateChanged => _auth.onAuthStateChanged;
+  Stream<User> get onAuthStateChanged => _auth.authStateChanges();
 
   Future currentUser() async {
     try {
-      FirebaseUser user = await _auth.currentUser();
+      User user = _auth.currentUser;
       return user;
     } catch (e) {
       return e.toString();
@@ -54,9 +54,9 @@ class AuthService extends ChangeNotifier {
     password,
   ) async {
     try {
-      FirebaseUser user = await _auth.currentUser();
-      AuthResult authResult = await user.reauthenticateWithCredential(
-        EmailAuthProvider.getCredential(
+      User user = _auth.currentUser;
+      UserCredential authResult = await user.reauthenticateWithCredential(
+        EmailAuthProvider.credential(
           email: user.email,
           password: password
         ));
@@ -71,7 +71,7 @@ class AuthService extends ChangeNotifier {
       @required String email,
   }) async {
       try {
-        FirebaseUser user = await _auth.currentUser();
+        User user = _auth.currentUser;
         var result = await user.updateEmail(email);
         notifyListeners();
         return result;
@@ -84,7 +84,7 @@ class AuthService extends ChangeNotifier {
       @required String password,
   }) async {
       try {
-        FirebaseUser user = await _auth.currentUser();
+        User user = _auth.currentUser;
         var result = await user.updatePassword(password);
         notifyListeners();
         return result;

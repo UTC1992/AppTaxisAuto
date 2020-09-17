@@ -12,7 +12,7 @@ class TaxistaViewModel {
       StreamController<Taxista>.broadcast();
 
   Future getTaxistaLogeado() async {
-    FirebaseUser result = await _authService.currentUser();
+    User result = await _authService.currentUser();
     if (result is String) {
       print('no se puedo obtener el usuario');
       return null;
