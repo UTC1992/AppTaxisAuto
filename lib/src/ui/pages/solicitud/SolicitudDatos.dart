@@ -646,11 +646,14 @@ class _SolicitudState extends State<SolicitudDatos> {
 
     Oferta ofertaAux = result;
     
+    //añadir id a objeto oferta
+    oferta.documentoID = ofertaAux.documentoID;
+    
     print('ID OFERTA => ' + ofertaAux.documentoID);
 
     ArgsSolicitudOferta argsSolicitudOferta = ArgsSolicitudOferta();
     argsSolicitudOferta.solicitudTaxi = _solicitudData;
-    argsSolicitudOferta.oferta = ofertaAux;
+    argsSolicitudOferta.oferta = oferta;
 
     Navigator.pop(context);
     Navigator.pop(context, argsSolicitudOferta);

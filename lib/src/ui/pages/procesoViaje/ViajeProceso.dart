@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 import 'dart:math';
 import 'package:AppTaxisAuto/src/models/ArgsSolicitudOferta.dart';
+import 'package:AppTaxisAuto/src/models/Oferta.dart';
 import 'package:AppTaxisAuto/src/models/SolicitudTaxi.dart';
 import 'package:AppTaxisAuto/src/models/Taxista.dart';
 import 'package:AppTaxisAuto/src/ui/widgets/solicitudes/ItemSolicitudProceso.dart';
@@ -69,7 +70,13 @@ class _StateViajeProceso extends State<ViajeProceso> {
   Map _taxiGPS;
 
   SolicitudTaxi _solicitudData;
-  Taxista _taxista;
+  Oferta _oferta;
+
+  //contado retroceso
+  Timer _timer;
+  int _start;
+  int minutos;
+  int contador = 0;
 
   void setInitialLocation() async {
     var isGpsEnabled = await Geolocator().isLocationServiceEnabled();
@@ -139,11 +146,55 @@ class _StateViajeProceso extends State<ViajeProceso> {
     });
   }
 
+  void startTimer() {
+    const oneSec = const Duration(seconds: 1);
+    _timer = new Timer.periodic(
+      oneSec,
+      (Timer timer) => setState(
+        () {
+
+          if (_start < 1) {
+            timer.cancel();
+          } else {
+            print('segundos ==> ' + _start.toString());
+            if(_start == (_oferta.tiempo * 60)) {
+              
+              if(contador == 0 && _start > 0) {
+                contador = 59;
+                minutos = minutos - 1;
+              }
+              _start = _start - 1;
+            } else {
+              _start = _start - 1;
+              contador--;
+
+              if(contador == 0 && _start > 0) {
+                contador = 59;
+                minutos = minutos - 1;
+              }
+              if(_start == 0) {
+                contador = 0;
+                minutos = 0;
+              }
+              
+            }
+          }
+        },
+      ),
+    );
+  }
+
   @override
   void initState() {
+    
     _solicitudData = widget.data.solicitudTaxi;
-    _taxista = widget.data.taxista;
+    _oferta = widget.data.oferta;
+    minutos = _oferta.tiempo; 
+    _start = _oferta.tiempo * 60;
+
     setInitialLocation();
+    startTimer();
+
     super.initState();
     /*BitmapDescriptor.fromAssetImage(
          ImageConfiguration(devicePixelRatio: 2.5),
@@ -151,6 +202,12 @@ class _StateViajeProceso extends State<ViajeProceso> {
             pinLocationIcon = onValue;
          });
     */
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
   }
 
   @override
@@ -228,7 +285,12 @@ class _StateViajeProceso extends State<ViajeProceso> {
                 children: [
                   SizedBox(height: 10,),
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      _mostrarRuta(
+                        _solicitudData.origenGPS['latitude'].toString(),
+                        _solicitudData.origenGPS['longitude'].toString()
+                      );
+                    },
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -276,6 +338,25 @@ class _StateViajeProceso extends State<ViajeProceso> {
             }
           },
         ),
+        Positioned(
+          top: 10,
+          child: Container(
+            width: screenSize.width,
+            alignment: Alignment.center,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(minutos.toString() +":"+ contador.toString(), 
+                  style: TextStyle(
+                    fontSize: 30,
+                    color: Colors.green[500],
+                    fontWeight: FontWeight.bold
+                  ),
+                )
+              ],
+            ),
+          ),
+        )
       ],
     );
   }
@@ -446,6 +527,21 @@ class _StateViajeProceso extends State<ViajeProceso> {
   }
 
   Future<void> _llamarAlTelefonoCliente(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+  Future<void> _mostrarRuta(String latitude, String longitude) async {
+
+    String url = "https://www.google.com/maps/dir/?api=1"+
+                    //'&origin='+origen.latitude+','+origen.longitude+
+                    '&destination='+latitude+','+longitude+
+                    '&language=es&components=country:ec'+
+                    '&travelmode=driving';
+
     if (await canLaunch(url)) {
       await launch(url);
     } else {

@@ -6,6 +6,7 @@ import 'package:AppTaxisAuto/src/models/SolicitudTaxi.dart';
 import 'package:AppTaxisAuto/src/models/Taxista.dart';
 import 'package:AppTaxisAuto/src/services/SolicitudTaxiService.dart';
 import 'package:AppTaxisAuto/src/ui/widgets/botones/BtnAceptar.dart';
+import 'package:AppTaxisAuto/src/ui/widgets/indicadorProgreso/IndicadorDesc.dart';
 import 'package:AppTaxisAuto/src/ui/widgets/solicitudes/ItemSolicitud.dart';
 import 'package:AppTaxisAuto/src/ui/widgets/solicitudes/ItemSolicitudCliente.dart';
 import 'package:AppTaxisAuto/src/viewmodel/TaxistaViewModel.dart';
@@ -14,14 +15,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:toast/toast.dart';
 
 class Solicitudes extends StatefulWidget {
   _SolicitudState createState() => _SolicitudState();
 }
 
 class _SolicitudState extends State<Solicitudes> with TickerProviderStateMixin {
-  AnimationController controller;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -70,11 +69,6 @@ class _SolicitudState extends State<Solicitudes> with TickerProviderStateMixin {
     setInitialLocation();
     _getUsuarioLogeado();
     escucharSolicitudes();
-    controller = AnimationController(
-      vsync: this,
-      duration: Duration(seconds: 30),
-    );
-
     super.initState();
   }
 
@@ -84,12 +78,12 @@ class _SolicitudState extends State<Solicitudes> with TickerProviderStateMixin {
   }
 
   void setInitialLocation() async {
-    _serviceEnabled = await location.serviceEnabled();
+    _serviceEnabled = await location.requestService();
     if (!_serviceEnabled) {
-      _serviceEnabled = await location.requestService();
-      if (!_serviceEnabled) {
-        return;
-      }
+      print("GPS desactivado");
+      return;
+    } else {
+      print("GPS Activo");
     }
 
     _permissionGranted = await location.hasPermission();
@@ -97,6 +91,8 @@ class _SolicitudState extends State<Solicitudes> with TickerProviderStateMixin {
       _permissionGranted = await location.requestPermission();
       if (_permissionGranted != PermissionStatus.granted) {
         return;
+      } else {
+        print('Permiso negado');
       }
     }
 
@@ -198,27 +194,13 @@ class _SolicitudState extends State<Solicitudes> with TickerProviderStateMixin {
     ArgsSolicitudOferta solicitudOfertaAux = data;
     solicitudOfertaAux.taxista = taxista;
 
-    if (controller.isAnimating)
-      controller.stop();
-    else {
-      controller.reverse(
-          from: controller.value == 0.0 ? 1.0 : controller.value)
-          .then((value){
-            print(controller.value);
-          });
-
-    }
-
     showMaterialModalBottomSheet(
         isDismissible: false,
         enableDrag: false,
         context: _scaffoldKey.currentContext,
         builder: (builder, scrollController) {
           var screenSize = MediaQuery.of(context).size;
-          return AnimatedBuilder(
-              animation: controller,
-              builder: (context, child) {
-                return StatefulBuilder(
+          return StatefulBuilder(
                   builder: (context, setState) {
                     return WillPopScope(
                         onWillPop: () {},
@@ -238,13 +220,7 @@ class _SolicitudState extends State<Solicitudes> with TickerProviderStateMixin {
                                     },
                                   ),
                                 ),
-                                LinearProgressIndicator(
-                                  backgroundColor: Colors.white,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    Colors.green[500],
-                                  ),
-                                  value: controller.value,
-                                ),
+                                IndicadorDesc(),
                                 SizedBox(
                                   height: 20,
                                 ),
@@ -294,10 +270,6 @@ class _SolicitudState extends State<Solicitudes> with TickerProviderStateMixin {
                                         );
                                       } else if (doc.data()['aceptada']) {
                                         
-                                        if (controller.isAnimating) {
-                                          controller.stop();
-                                        }
-
                                         return Flex(
                                           direction: Axis.vertical,
                                           children: [
@@ -394,7 +366,7 @@ class _SolicitudState extends State<Solicitudes> with TickerProviderStateMixin {
                             )));
                   },
                 );
-              });
+              
         });
   }
 }
