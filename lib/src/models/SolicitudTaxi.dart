@@ -1,4 +1,6 @@
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class SolicitudTaxi {
   String clienteID;
   String origenDireccion;
@@ -8,6 +10,12 @@ class SolicitudTaxi {
   double tarifa;
   String comentario;
   String documentID;
+  bool cancelada;
+  String idTaxista;
+  bool finalizada;
+  int estado;
+  Timestamp fechaCreacion;
+  Timestamp fechaOrdenar;
 
   SolicitudTaxi({
     this.clienteID,
@@ -17,7 +25,13 @@ class SolicitudTaxi {
     this.destinoGPS,
     this.tarifa,
     this.comentario,
-    this.documentID
+    this.documentID,
+    this.cancelada,
+    this.idTaxista,
+    this.finalizada,
+    this.estado,
+    this.fechaCreacion,
+    this.fechaOrdenar
   });
 
   Map<String, dynamic> toMap() => {
@@ -33,7 +47,13 @@ class SolicitudTaxi {
       'longitude' :  destinoGPS['longitude'],
     },
     'tarifa': tarifa,
-    'comentario': comentario
+    'comentario': comentario,
+    'cancelada': cancelada,
+    'idTaxista': idTaxista,
+    'finalizada': finalizada,
+    'estado': estado,
+    'fechaCreacion': fechaCreacion,
+    'fechaOrdenar': fechaOrdenar
   };
 
    SolicitudTaxi.fromJson(Map<String, dynamic> json, String documentoID)
@@ -50,6 +70,12 @@ class SolicitudTaxi {
           'longitude' : json['destinoGPS']['longitude'],
         },
         tarifa = json['tarifa'],
-        comentario = json['comentario'];
+        comentario = json['comentario'],
+        cancelada = json['cancelada'],
+        idTaxista = json['idTaxista'],
+        finalizada = json['finalizada'],
+        estado = json['estado'],
+        fechaCreacion = json['fechaCreacion'],
+        fechaOrdenar = json['fechaOrdenar'];
 
 }

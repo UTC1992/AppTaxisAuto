@@ -29,6 +29,7 @@ class _ItemState extends State<ItemSolicitudProceso> {
   int _pedidos = 0;
   int _estrellas = 0;
   String _urlImagenCliente;
+  String telefono;
 
   _obtenerCliente() async {
     _cliente = await _solicitudTaxiViewModel.getClienteByID(widget.elemento.clienteID);
@@ -150,7 +151,7 @@ class _ItemState extends State<ItemSolicitudProceso> {
               ),
             ),
             GestureDetector(
-              onTap: widget.onPress,
+              onTap: () => widget.onPress(_cliente.telefono),
               child: Container(
                 width: 45,
                 height: 45,

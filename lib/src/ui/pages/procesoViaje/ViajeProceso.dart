@@ -4,12 +4,14 @@ import 'dart:math';
 import 'package:AppTaxisAuto/src/models/ArgsSolicitudOferta.dart';
 import 'package:AppTaxisAuto/src/models/Oferta.dart';
 import 'package:AppTaxisAuto/src/models/SolicitudTaxi.dart';
-import 'package:AppTaxisAuto/src/models/Taxista.dart';
+import 'package:AppTaxisAuto/src/providers/push_notifications_provider.dart';
+import 'package:AppTaxisAuto/src/services/SolicitudTaxiService.dart';
 import 'package:AppTaxisAuto/src/ui/widgets/solicitudes/ItemSolicitudProceso.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:location/location.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
 import '../../widgets/botones/BtnAceptar.dart';
 import '../../widgets/botones/BtnUbicacionCentrar.dart';
 import '../../../viewmodel/SolicitudTaxiViewModel.dart';
@@ -32,7 +34,8 @@ class ViajeProceso extends StatefulWidget {
 
 class _StateViajeProceso extends State<ViajeProceso> {
   //solicitud view model
-  SolicitudTaxiViewModel _solicitudTaxiViewModel = new SolicitudTaxiViewModel();
+  SolicitudTaxiService _solicitudTaxiService = SolicitudTaxiService();
+  SolicitudTaxiViewModel _solicitudTaxiViewModel = SolicitudTaxiViewModel();
 
   ///variable para obtener ubicacion
   Location location = new Location();
@@ -71,6 +74,7 @@ class _StateViajeProceso extends State<ViajeProceso> {
 
   SolicitudTaxi _solicitudData;
   Oferta _oferta;
+  SolicitudTaxi _solicitudEscuchar;
 
   //contado retroceso
   Timer _timer;
@@ -139,7 +143,9 @@ class _StateViajeProceso extends State<ViajeProceso> {
   ///asignar mapa aun controlador
   void _onMapCreated(GoogleMapController controller) {
     _controllerComplete.complete(controller);
+    
     setPolylines();
+
     print('CREARRR MAPA');
     setState(() {
       liteModeMap = true;
@@ -184,6 +190,39 @@ class _StateViajeProceso extends State<ViajeProceso> {
     );
   }
 
+  void _escucharEstadosSolicitud() {
+    _solicitudTaxiService.getSolicitudById(widget.data.solicitudTaxi.documentID)
+    .listen((doc) {
+      SolicitudTaxi objeto = doc;
+      print('Estado solicitud => ' + objeto.estado.toString());
+      if(objeto != null) {
+        setState(() {
+          _solicitudEscuchar = objeto;
+          if(objeto.estado == 3) {
+            if (markers.containsKey(MarkerId('Cliente'))) {
+              _getUserLocation();
+              updateCameraLocation();
+            }
+            markers.remove( MarkerId('Cliente'));
+            _polylines.removeWhere((poli) => poli.polylineId == PolylineId("linea1"));
+          }
+        });
+      }
+
+     });
+  } 
+
+  void actualizarEstado(int estado) async {
+    await _solicitudTaxiViewModel
+    .updateEstado(estado: estado, documentID: _solicitudData.documentID);
+  }
+
+  void terminarPedido() async {
+    await _solicitudTaxiViewModel
+    .finalizarPedido(documentID: _solicitudData.documentID);
+    Navigator.pop(context);
+  }
+
   @override
   void initState() {
     
@@ -194,6 +233,7 @@ class _StateViajeProceso extends State<ViajeProceso> {
 
     setInitialLocation();
     startTimer();
+    _escucharEstadosSolicitud();
 
     super.initState();
     /*BitmapDescriptor.fromAssetImage(
@@ -217,7 +257,11 @@ class _StateViajeProceso extends State<ViajeProceso> {
         automaticallyImplyLeading: false,
         actions: [
           GestureDetector(
-            onTap: () {},
+            onTap: () async {
+              await _solicitudTaxiViewModel
+              .cancelarSolicitud(documentoID: _solicitudData.documentID);
+              Navigator.pop(context);
+            },
             child: Container(
               width: 100,
               alignment: Alignment.center,
@@ -229,12 +273,16 @@ class _StateViajeProceso extends State<ViajeProceso> {
           ),
         ],
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          color: Colors.white
+      body: WillPopScope(
+        onWillPop: () {},
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white
+          ),
+          child: getProcesoViaje(context),
         ),
-        child: getProcesoViaje(context),
-      )
+      ), 
+      
     );
   }
 
@@ -286,10 +334,19 @@ class _StateViajeProceso extends State<ViajeProceso> {
                   SizedBox(height: 10,),
                   GestureDetector(
                     onTap: () {
-                      _mostrarRuta(
-                        _solicitudData.origenGPS['latitude'].toString(),
-                        _solicitudData.origenGPS['longitude'].toString()
-                      );
+                      if (_solicitudEscuchar.estado == 2) {
+                        _mostrarRuta(
+                          _solicitudData.origenGPS['latitude'].toString(),
+                          _solicitudData.origenGPS['longitude'].toString()
+                        );
+                      }
+                      if (_solicitudEscuchar.estado > 2) {
+                        _mostrarRuta(
+                          _solicitudData.destinoGPS['latitude'].toString(),
+                          _solicitudData.destinoGPS['longitude'].toString()
+                        );
+                      }
+                      
                     },
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -308,19 +365,25 @@ class _StateViajeProceso extends State<ViajeProceso> {
                     ),
                   ),
                   ItemSolicitudProceso(
-                    onPress: (){
-                      String _phone = '0979298483';
-                      _llamarAlTelefonoCliente('tel://$_phone');
-                    },
+                    onPress: _llamarAlTelefonoCliente,
                     elemento: widget.data.solicitudTaxi,
                   ),
                   SizedBox(height: 10,),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20),
                     child: BtnAceptar(
-                      activo: true,
-                      onPress: () {},
-                      titulo: 'He llegado',
+                      activo: _solicitudEscuchar.estado == 2,
+                      onPress: () async {
+                        if(_solicitudEscuchar.estado == 2) {
+                          actualizarEstado(3);
+                          enviarNotificacion();
+                        } else {
+                          terminarPedido();
+                        }
+                      },
+                      titulo: _solicitudEscuchar.estado == 2 
+                      ? 'He llegado'
+                      : 'Terminar viaje',
                     )
                   ),
                   SizedBox(height: 10,)
@@ -332,8 +395,8 @@ class _StateViajeProceso extends State<ViajeProceso> {
           bottom: (screenSize.height / 2.5),
           right: 10,
           onPress: () async {
-            if (markers.length > 2) {
-              print('CENTRAR MARCADORESSSSS');
+            if (markers.length > 0) {
+              print('CENTRAR MARCADORES');
               await updateCameraLocation();
             }
           },
@@ -346,10 +409,17 @@ class _StateViajeProceso extends State<ViajeProceso> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(minutos.toString() +":"+ contador.toString(), 
+                Text(
+                  _solicitudEscuchar.estado == 2
+                  ? minutos.toString() +":"+ contador.toString() 
+                  : _solicitudEscuchar.estado == 3
+                  ? 'Se envio una notificación al pasajero.'
+                  : 'Pasajero en camino',
                   style: TextStyle(
-                    fontSize: 30,
-                    color: Colors.green[500],
+                    fontSize: _solicitudEscuchar.estado == 2 ? 40 : 20,
+                    color: _solicitudEscuchar.estado == 2 
+                    ? Colors.green[500]
+                    : Colors.black,
                     fontWeight: FontWeight.bold
                   ),
                 )
@@ -389,7 +459,27 @@ class _StateViajeProceso extends State<ViajeProceso> {
     print('CENRANDO MARKERS');
     GoogleMapController mapController = await _controllerComplete.future;
 
-    LatLngBounds bounds = getBounds(markerList);
+    List<Marker> markerListAux = new List();
+
+    if (_solicitudEscuchar.estado == 2) {
+      for (var i = 0; i < (markerList.length-1); i++) {
+        markerListAux.add(markerList[i]);
+      }
+    }
+
+    if (_solicitudEscuchar.estado == 3) {
+      for (var i = 0; i < markerList.length; i++) {
+        markerListAux.add(markerList[i]);
+      }
+      markerListAux.removeAt(1);
+      final MarkerId markerId = MarkerId('Cliente');
+      setState(() {
+        markers.remove(markerId);
+        _polylines.removeWhere((poli) => poli.polylineId == PolylineId("linea1"));
+      });
+    }
+
+    LatLngBounds bounds = getBounds(markerListAux);
     //mapController.animateCamera(CameraUpdate.newLatLngBounds(bounds, 100));
 
     CameraUpdate cameraUpdate = CameraUpdate.newLatLngBounds(bounds, 70);
@@ -442,13 +532,13 @@ class _StateViajeProceso extends State<ViajeProceso> {
       // create a Polyline instance
       // with an id, an RGB color and the list of LatLng pairs
       Polyline polyline = Polyline(
-          polylineId: PolylineId("linea1"),
+          polylineId: PolylineId("linea2"),
           color: Colors.blue[600],
           points: polylineCoordinates,
           width: 5);
 
       Polyline polylineTaxi = Polyline(
-          polylineId: PolylineId("linea2"),
+          polylineId: PolylineId("linea1"),
           color: Colors.orange[500],
           points: polylineCoordinatesTaxi,
           width: 4,
@@ -526,7 +616,8 @@ class _StateViajeProceso extends State<ViajeProceso> {
     return bounds;
   }
 
-  Future<void> _llamarAlTelefonoCliente(String url) async {
+  Future<void> _llamarAlTelefonoCliente(String _telefono) async {
+    String url = 'tel://$_telefono';
     if (await canLaunch(url)) {
       await launch(url);
     } else {
@@ -547,6 +638,13 @@ class _StateViajeProceso extends State<ViajeProceso> {
     } else {
       throw 'Could not launch $url';
     }
+  }
+  
+  void enviarNotificacion() async {
+    var notificaciones = 
+    Provider.of<PushNotificationProvider>(context, listen: false); 
+    await notificaciones.sendAndRetrieveMessage();
+
   }
 
 }

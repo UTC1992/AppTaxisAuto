@@ -13,7 +13,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => AuthService(),),
-        Provider(create: (context) => PushNotificationProvider,)
+        Provider<PushNotificationProvider>(create: (context) => PushNotificationProvider(),)
       ],
       child: NavigationApp(),
     )

@@ -22,6 +22,8 @@ class SolicitudTaxiService {
       StreamController<List<SolicitudTaxi>>.broadcast();
   final StreamController<Oferta> _ofertaController =
       StreamController<Oferta>.broadcast();
+  final StreamController<SolicitudTaxi> _solicitudByIDController =
+      StreamController<SolicitudTaxi>.broadcast();
 
   Stream getSolicitudesList() {
       _collectionSolicitud
@@ -107,5 +109,61 @@ class SolicitudTaxiService {
       });
       return _ofertaController.stream;
   } 
+
+  Stream getSolicitudById(String documentoID) {
+    _collectionSolicitud
+      .doc(documentoID)
+      .snapshots().listen((doc) {
+        if(doc.exists){
+          var docSolicitud = SolicitudTaxi.fromJson(doc.data(), doc.id);
+
+          _solicitudByIDController.add(docSolicitud);
+        }
+      });
+      return _solicitudByIDController.stream;
+  }
+
+  Future updateSolicitudEstado({
+    @required String documentID,
+    @required int estado,
+  }) async {
+    try {
+      await _collectionSolicitud
+      .doc(documentID)
+      .update({'estado': estado});
+
+      return true;
+    } catch (e) {
+      return e.toString();
+    }
+  }
+
+  Future finalizarPedido({
+    @required String documentID
+  }) async {
+    try {
+      await _collectionSolicitud
+      .doc(documentID)
+      .update({'finalizada': true});
+
+      return true;
+    } catch (e) {
+      return e.toString();
+    }
+  }
+
+  Future cancelarPedido({
+    @required String documentID
+  }) async {
+    try {
+      await _collectionSolicitud
+      .doc(documentID)
+      .update({'cancelada': true});
+
+      return true;
+    } catch (e) {
+      return e.toString();
+    }
+  }
 
 }

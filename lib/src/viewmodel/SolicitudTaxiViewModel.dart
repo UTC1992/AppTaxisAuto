@@ -49,4 +49,45 @@ class SolicitudTaxiViewModel extends AuthService{
 
   }
 
+  Future updateEstado({
+      @required int estado,
+      @required String documentID,
+  }) async {
+    var result = await _solicitudTaxiService.
+    updateSolicitudEstado(documentID: documentID, estado: estado);
+
+    if (result is String) {
+      print('Error al actualizar ' + result);
+    } else {
+      print('Exito al actualizar estado');
+    }
+
+  }
+
+  Future finalizarPedido({
+      @required String documentID,
+  }) async {
+    var result = await _solicitudTaxiService.
+    finalizarPedido(documentID: documentID);
+
+    if (result is String) {
+      print('Error al actualizar ' + result);
+    } else {
+      print('Exito al actualizar estado');
+    }
+
+  }
+
+  Future cancelarSolicitud({
+    @required String documentoID
+  }) async {
+    var result =
+        await _solicitudTaxiService.cancelarPedido(documentID: documentoID);
+    if (result is String) {
+      print('error => ' + result);
+    } else {
+      print('Se cancelo la solicitud');
+    }
+  }
+
 }
