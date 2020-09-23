@@ -10,6 +10,8 @@ class DrawerNavigation extends StatefulWidget {
 
 class _DrawerState extends State<DrawerNavigation> {
 
+  AuthService authService = AuthService();
+
   int _selectDrawerItem = 0;
 
   _getDrawerItemWidget(int posicion) {
@@ -38,6 +40,12 @@ class _DrawerState extends State<DrawerNavigation> {
     setState(() {
       _selectDrawerItem = posicion;
     });
+  }
+
+  cerrarSesion() async {
+    await authService.cerrarSesion();
+    Navigator.of(context).pushNamedAndRemoveUntil('/bienvenida', 
+    (Route<dynamic> route) => false);
   }
 
   @override
@@ -91,8 +99,7 @@ class _DrawerState extends State<DrawerNavigation> {
               leading: Icon(Icons.close),
               selected: false,
               onTap: () {
-                AuthService auth = AuthService();
-                auth.signOut();
+                cerrarSesion();
               },
             ),
           ],

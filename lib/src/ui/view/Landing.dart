@@ -5,31 +5,43 @@ import 'package:provider/provider.dart';
 import 'Bienvenida.dart';
 import '../../navigation/DrawerNavigation.dart';
 
-class Landing extends StatelessWidget {
+class Landing extends StatefulWidget {
+
+  @override
+  StateLanding createState() => StateLanding();
+
+}
+
+class StateLanding extends State<Landing> {
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  revisarInicioSesion() {
+    _auth.authStateChanges().listen((result) {
+      print('REVISANDO LOGIN DEL USUARIOOO');
+      print(result);
+
+      if (result != null) {
+        Navigator.pushNamed(context, '/dashboard');
+      } else {
+        Navigator.pushNamed(context, '/bienvenida');
+      }
+
+    });
+  }
+
+  @override
+  void initState() {
+    revisarInicioSesion();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    AuthService authFirebase = Provider.of<AuthService>(context);
-    return StreamBuilder<User>(
-          stream: authFirebase.onAuthStateChanged,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.active) {
-              User user = snapshot.data;
-              if(user == null) {
-                return Bienvenida();
-              } else {
-                print(user.email);
-                return DrawerNavigation();
-              }
-
-            } else {
-              return Scaffold(
-                body: Center(
-                  child: CircularProgressIndicator(),
-                ),
-              );
-            }
-          },
-        );
+    return Scaffold(
+      body: Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
   }
 }

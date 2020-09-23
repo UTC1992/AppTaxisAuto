@@ -30,8 +30,6 @@ class _CiudadState extends State<Ciudad>
             child: RaisedButton(
               child: Text('cerrar sesion'),
               onPressed: () {
-                AuthService auth = AuthService();
-                auth.signOut();
               },
             ),
           ),

@@ -20,14 +20,8 @@ class PushNotificationProvider with ChangeNotifier {
     _firebaseMessaging.requestNotificationPermissions(
         const IosNotificationSettings(
             sound: true, badge: true, alert: true, provisional: true));
-    _firebaseMessaging.getToken().then((token) {
-      if(token != null) {
-        print('==== FCM Token ====');
-        print(token);
-        updateToken(token);
-      }
-      
-    });
+
+    updateToken();
 
     _firebaseMessaging.configure(
       onBackgroundMessage: mensajeEnSegundoPlano,
@@ -61,26 +55,37 @@ class PushNotificationProvider with ChangeNotifier {
     // Or do other work.
   }
 
-  Future updateToken(String token ) async {
+  Future updateToken() async {
 
-    User userLogin = await _authService.currentUser();
+    _firebaseMessaging.getToken().then((token) async {
+      if(token != null) {
+        print('==== FCM Token ====');
+        print(token);
+        User userLogin = await _authService.currentUser();
 
-    QuerySnapshot documents = await _taxistaService.getIdDocument(userLogin.email);
+        if(userLogin != null) {
+          QuerySnapshot documents = await _taxistaService.getIdDocument(userLogin.email);
 
-    var idCliente;
+          var idCliente;
 
-    documents.docs.forEach((doc) {
-      idCliente = doc.id;
+          documents.docs.forEach((doc) {
+            idCliente = doc.id;
+          });
+
+          var result = await _taxistaService.
+          updateToken(documentID: idCliente, token: token);
+
+          if (result is String) {
+            print('Error al actualizar ' + result);
+          } else {
+            print('Exito al actualizar token');
+          }
+        }
+      }
+      
     });
 
-    var result = await _taxistaService.
-    updateToken(documentID: idCliente, token: token);
-
-    if (result is String) {
-      print('Error al actualizar ' + result);
-    } else {
-      print('Exito al actualizar token');
-    }
+    
 
   }
 

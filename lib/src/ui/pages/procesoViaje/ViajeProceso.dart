@@ -203,6 +203,7 @@ class _StateViajeProceso extends State<ViajeProceso> {
               _getUserLocation();
               updateCameraLocation();
             }
+            _start = 0;
             markers.remove( MarkerId('Cliente'));
             _polylines.removeWhere((poli) => poli.polylineId == PolylineId("linea1"));
           }

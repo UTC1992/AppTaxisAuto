@@ -3,6 +3,7 @@ import 'package:AppTaxisAuto/src/models/ArgumentosSolicitudDatos.dart';
 import 'package:AppTaxisAuto/src/models/Taxista.dart';
 import 'package:flutter/material.dart';
 import '../ui/view/Landing.dart';
+import '../ui/view/Bienvenida.dart';
 import '../ui/view/Login.dart';
 import '../ui/view/Registro.dart';
 import '../ui/view/Viajes.dart';
@@ -25,13 +26,16 @@ class RouteGenerator {
       case '/':
         return MaterialPageRoute(builder: (context) => Landing());
         break;
+      case '/bienvenida':
+        return MaterialPageRoute(builder: (context) => Bienvenida());
+        break;
       case '/login':
         return MaterialPageRoute(builder: (context) => Login());
         break;
       case '/registro':
         return MaterialPageRoute(builder: (context) => Registro());
         break;
-      case '/pedidos':
+      case '/dashboard':
         return MaterialPageRoute(builder: (context) => DrawerNavigation());
         break;
       case '/viajes':

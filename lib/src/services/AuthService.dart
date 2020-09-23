@@ -16,11 +16,6 @@ class AuthService extends ChangeNotifier {
     }
     
   }
-  
-  Future<void> signOut() async {
-    await _auth.signOut();
-    notifyListeners();
-  }
 
   Future loginWithEmail({
       @required String email,
@@ -91,6 +86,17 @@ class AuthService extends ChangeNotifier {
       } catch (e) {
           return e.toString();
       }
+  }
+
+  Future cerrarSesion() async {
+    try {
+      await _auth.signOut();
+      notifyListeners();
+      return true;
+    } catch (e) {
+      return e.toString();
+    }
+    
   }
 
 }

@@ -1,4 +1,6 @@
+import 'package:AppTaxisAuto/src/providers/push_notifications_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../viewmodel/LoginViewModel.dart';
 import '../../models/UserAutenticacion.dart';
 import 'package:validators/validators.dart' as validator;
@@ -30,7 +32,14 @@ class _FormLoginState extends State<FormLogin> {
 
   _iniciarSesion () {
     _loginViewModel.login(email: userAuth.email, password: userAuth.password);
-    Navigator.pop(context);
+    
+    PushNotificationProvider notificaciones = Provider.of<PushNotificationProvider>(context, listen: false);
+    notificaciones.updateToken();
+
+    //eliminar todas las rutas anteriores de la pila para que no se pueda regresar a ellas
+    Navigator.of(context).pushNamedAndRemoveUntil('/dashboard', 
+    (Route<dynamic> route) => false);
+    //Navigator.pop(context);
   }
 
   @override
