@@ -30,7 +30,7 @@ class _FormLoginState extends State<FormLogin> {
 
   LoginViewModel _loginViewModel = LoginViewModel();
 
-  _iniciarSesion () {
+  _iniciarSesion() {
     _loginViewModel.login(email: userAuth.email, password: userAuth.password);
     
     PushNotificationProvider notificaciones = Provider.of<PushNotificationProvider>(context, listen: false);

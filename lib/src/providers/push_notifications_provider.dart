@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:AppTaxisAuto/src/services/AuthService.dart';
 import 'package:AppTaxisAuto/src/services/TaxistaService.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
