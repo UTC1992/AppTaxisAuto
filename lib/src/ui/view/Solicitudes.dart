@@ -57,9 +57,12 @@ class _SolicitudState extends State<Solicitudes> with TickerProviderStateMixin {
       print('ESCUCHANDO SOLICITUDES');
       List<SolicitudTaxi> updateList = dataList;
       if (updateList != null && updateList.length > 0) {
-        setState(() {
-          _solicitudes = updateList;
-        });
+        if(mounted) {
+          setState(() {
+            _solicitudes = updateList;
+          });
+        }
+        
       }
     });
   }
@@ -171,25 +174,7 @@ class _SolicitudState extends State<Solicitudes> with TickerProviderStateMixin {
   }
 
   _mostrarEstadoOferta(ArgsSolicitudOferta data) {
-    /*_solicitudTaxiService
-        .getEstadoOferta(idOferta: data.oferta.documentoID)
-        .listen((value) {
-      Oferta oferta = value;
-      if (oferta != null) {
-        print('OFERTA ENVIADA');
-        print(oferta.documentoID);
-        if (oferta.aceptada) {}
-        if (oferta.rechazada) {
-          print('OFERTA RECHASADA');
-          //Navigator.pop(context);
-          Toast.show("Oferta rechazada", _scaffoldKey.currentContext,
-              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-        }
-      }
-    }).onError((handleError) {
-      print(handleError.toString());
-    });
-    */
+    
 
     ArgsSolicitudOferta solicitudOfertaAux = data;
     solicitudOfertaAux.taxista = taxista;

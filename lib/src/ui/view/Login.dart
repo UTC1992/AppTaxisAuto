@@ -1,10 +1,7 @@
-import 'package:AppTaxisAuto/src/providers/push_notifications_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../../viewmodel/LoginViewModel.dart';
 import '../../models/UserAutenticacion.dart';
 import 'package:validators/validators.dart' as validator;
-
 class Login extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -30,20 +27,81 @@ class _FormLoginState extends State<FormLogin> {
 
   LoginViewModel _loginViewModel = LoginViewModel();
 
-  _iniciarSesion() {
-    _loginViewModel.login(email: userAuth.email, password: userAuth.password);
+  _iniciarSesion() async {
+    dynamic result = await _loginViewModel.login(email: userAuth.email, password: userAuth.password);
     
-    PushNotificationProvider notificaciones = Provider.of<PushNotificationProvider>(context, listen: false);
-    notificaciones.updateToken();
+    if (result is bool) {
+      if (result) {
+        //eliminar todas las rutas anteriores de la pila para que no se pueda regresar a ellas
+        Navigator.of(context).pushNamedAndRemoveUntil('/dashboard', 
+        (Route<dynamic> route) => false);
+      } else {
+        mostrarErrorEnLogin('Ocurrio un error al iniciar sesión, intentelo nuevamente por favor');
+      }
+    } else {
+      if (result == 'user-not-found') mostrarErrorEnLogin('Usuario incorrecto');
+      if (result == 'wrong-password') mostrarErrorEnLogin('Contraseña incorrecta');
+    }
 
-    //eliminar todas las rutas anteriores de la pila para que no se pueda regresar a ellas
-    Navigator.of(context).pushNamedAndRemoveUntil('/dashboard', 
-    (Route<dynamic> route) => false);
     //Navigator.pop(context);
+  }
+
+  void mostrarErrorEnLogin(String mensaje) {
+      showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        var screenSize = MediaQuery.of(context).size;
+        // return object of type Dialog
+        return AlertDialog(
+          actions:  <Widget>[
+            SizedBox(height: 10.0,),
+            Container(
+              alignment: Alignment.center,
+              child: Text(mensaje,
+                style: TextStyle(
+                  fontSize: 25,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+            SizedBox(height: 10.0,),
+            Container(
+              width: screenSize.width,
+              padding: EdgeInsets.all(10.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Container(
+                      child: Text('Ok',
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.blue[800],
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+          ],
+        );
+      },
+    );
+  
   }
 
   @override
   Widget build(BuildContext context) {
+    var screenSize = MediaQuery.of(context).size;
+
     return Stack(
       alignment: const Alignment(0.6, 0.6),
       children: [
@@ -69,24 +127,26 @@ class _FormLoginState extends State<FormLogin> {
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
-                        SizedBox(
-                          height: 100,
-                        ),
-                        Padding(
-                          padding: EdgeInsets.all(20),
+                        SizedBox(height: 50,),
+                        Container(
+                          decoration: BoxDecoration(
+                            //color: Colors.green
+                          ),
+                          height: screenSize.height / 3,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
                               Text(
                                 'Iniciar sesión',
                                 style: TextStyle(
-                                    color: Colors.white, fontSize: 40),
+                                    color: Colors.white, 
+                                    fontSize: 40, 
+                                    fontWeight: FontWeight.bold
+                                ),
                               )
                             ],
                           ),
-                        ),
-                        SizedBox(
-                          height: 20,
                         ),
                         Padding(
                         padding: EdgeInsets.all(10),
@@ -127,21 +187,25 @@ class _FormLoginState extends State<FormLogin> {
                                                 bottom: BorderSide(
                                                     color: Colors.grey[200]))),
                                         child: TextFormField(
+                                          style: TextStyle(
+                                            fontSize: 18
+                                          ),
                                           decoration: InputDecoration(
                                               hintText: 'Correo electrónico',
                                               hintStyle:
                                                   TextStyle(color: Colors.grey),
-                                              border: InputBorder.none),
+                                              border: InputBorder.none,
+                                              ),
                                           validator: (String value) {
-                                            if (value.isEmpty) {
+                                            if (value.trim().isEmpty) {
                                               return 'Correo requerido';
                                             }
-                                            if (!validator.isEmail(value)) {
+                                            if (!validator.isEmail(value.trim())) {
                                               return 'Correo invalido';
                                             }
                                             return null;
                                           },
-                                          onChanged: (String value) => userAuth.email = value,
+                                          onChanged: (String value) => userAuth.email = value.trim(),
                                           keyboardType: TextInputType.emailAddress,
                                         ),
                                       ),
@@ -152,6 +216,9 @@ class _FormLoginState extends State<FormLogin> {
                                                 bottom: BorderSide(
                                                     color: Colors.grey[200]))),
                                         child: TextFormField(
+                                          style: TextStyle(
+                                            fontSize: 18
+                                          ),
                                           decoration: InputDecoration(
                                               hintText: 'Contraseña',
                                               hintStyle:
@@ -178,7 +245,10 @@ class _FormLoginState extends State<FormLogin> {
                                 ),
                                 Text(
                                   '¿ Olvido la contraseña ? ',
-                                  style: TextStyle(color: Colors.grey),
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 18
+                                    ),
                                 ),
                                 SizedBox(
                                   height: 20,
@@ -201,7 +271,7 @@ class _FormLoginState extends State<FormLogin> {
                                         'Iniciar sesión',
                                         style: TextStyle(
                                             color: Colors.white,
-                                            fontSize: 16,
+                                            fontSize: 18,
                                             fontWeight: FontWeight.bold),
                                       ),
                                     ),
@@ -246,8 +316,3 @@ class _FormLoginState extends State<FormLogin> {
     );
   }
 }
-
-/* new Image.network(
-                  'https://firebasestorage.googleapis.com/v0/b/kukayodeliveryapp.appspot.com/o/9pNsaTgjXC5n7yqvAEih%2Fproductos%2F3ViU06FZ0mL7usJdQQl9.jpeg?alt=media&token=c2f20771-a47d-4a62-96fb-b2f7bc80fbc3',
-                ),
- */

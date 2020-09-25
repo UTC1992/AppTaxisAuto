@@ -3,9 +3,11 @@ import 'dart:ui';
 import 'dart:math';
 import 'package:AppTaxisAuto/src/models/ArgsSolicitudOferta.dart';
 import 'package:AppTaxisAuto/src/models/Oferta.dart';
+import 'package:AppTaxisAuto/src/models/Rating.dart';
 import 'package:AppTaxisAuto/src/models/SolicitudTaxi.dart';
 import 'package:AppTaxisAuto/src/providers/push_notifications_provider.dart';
 import 'package:AppTaxisAuto/src/services/SolicitudTaxiService.dart';
+import 'package:AppTaxisAuto/src/ui/widgets/calificar/CalificarViaje.dart';
 import 'package:AppTaxisAuto/src/ui/widgets/solicitudes/ItemSolicitudProceso.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -82,6 +84,9 @@ class _StateViajeProceso extends State<ViajeProceso> {
   int minutos;
   int contador = 0;
 
+  //ratin para taxista
+  Rating _ratingTaxista;
+
   void setInitialLocation() async {
     var isGpsEnabled = await Geolocator().isLocationServiceEnabled();
     if (!isGpsEnabled) {
@@ -110,33 +115,22 @@ class _StateViajeProceso extends State<ViajeProceso> {
     location.getLocation().then((response) {
       _locationData = response;
 
-      _addMarkersMap('Yo', _locationData.latitude, _locationData.longitude,
-          Colors.blue[700], Icons.drive_eta, '', 80);
-      _addMarkersMap(
-          'Cliente',
-          _solicitudData.origenGPS['latitude'],
-          _solicitudData.origenGPS['longitude'],
-          Colors.orange[500],
-          Icons.location_on,
-          '',
-          60);
-      _addMarkersMap(
-          'Destino',
-          _solicitudData.destinoGPS['latitude'],
-          _solicitudData.destinoGPS['longitude'],
-          Colors.green[500],
-          Icons.location_on,
-          '',
-          60);
-
       print('latitud' + _locationData.latitude.toString());
-      setState(() {
-        mostrarMapa = true;
-        _taxiGPS = {
-          'latitude': _locationData.latitude,
-          'longitude': _locationData.longitude
-        };
-      });
+      print('longitude' + _locationData.longitude.toString());
+
+      if(_locationData != null) {
+        _addMarkersMap('Auto', _locationData.latitude, _locationData.longitude,
+          Colors.blue[700], Icons.drive_eta, '', 80, true);
+        
+        setState(() {
+          mostrarMapa = true;
+          _taxiGPS = {
+            'latitude': _locationData.latitude,
+            'longitude': _locationData.longitude
+          };
+        });
+      }
+      
     });
   }
 
@@ -195,18 +189,23 @@ class _StateViajeProceso extends State<ViajeProceso> {
     .listen((doc) {
       SolicitudTaxi objeto = doc;
       print('Estado solicitud => ' + objeto.estado.toString());
-      if(objeto != null) {
+      if(objeto != null && mounted) {
         setState(() {
           _solicitudEscuchar = objeto;
           if(objeto.estado == 3) {
             if (markers.containsKey(MarkerId('Cliente'))) {
+              //markers.remove( MarkerId('Cliente'));
+              _polylines.removeWhere((poli) => poli.polylineId == PolylineId("linea1"));
               _getUserLocation();
-              updateCameraLocation();
             }
             _start = 0;
-            markers.remove( MarkerId('Cliente'));
-            _polylines.removeWhere((poli) => poli.polylineId == PolylineId("linea1"));
+            
           }
+
+          if (objeto.cancelada) {
+
+          }
+
         });
       }
 
@@ -218,10 +217,46 @@ class _StateViajeProceso extends State<ViajeProceso> {
     .updateEstado(estado: estado, documentID: _solicitudData.documentID);
   }
 
-  void terminarPedido() async {
+  addMarcadores() {
+    _addMarkersMap(
+          'Cliente',
+          _solicitudData.origenGPS['latitude'],
+          _solicitudData.origenGPS['longitude'],
+          Colors.orange[500],
+          Icons.location_on,
+          '',
+          60, true);
+    _addMarkersMap(
+        'Destino',
+        _solicitudData.destinoGPS['latitude'],
+        _solicitudData.destinoGPS['longitude'],
+        Colors.green[500],
+        Icons.location_on,
+        '',
+        60, true);
+  }
+
+  _cancelarSolicitud() async {
     await _solicitudTaxiViewModel
-    .finalizarPedido(documentID: _solicitudData.documentID);
-    Navigator.pop(context);
+    .cancelarSolicitud(documentoID: _solicitudData.documentID);
+    Navigator.of(context).pushNamedAndRemoveUntil('/dashboard', 
+      (Route<dynamic> route) => false);
+  }
+  
+  _obtenerRatingTaxista() async {
+    Rating rating1 =
+        await _solicitudTaxiViewModel.getRatingTaxista(widget.data.solicitudTaxi.idTaxista);
+    
+    setState(() {
+      _ratingTaxista = rating1;
+    });
+  }
+
+  void addPedidosTaxista() async {
+    int pedidosTotal = _ratingTaxista.pedidos + 1;
+    await _solicitudTaxiViewModel
+    .updateRatingPedidosTaxista(documentID: _ratingTaxista.documentoID, pedidos: pedidosTotal);
+    
   }
 
   @override
@@ -232,17 +267,22 @@ class _StateViajeProceso extends State<ViajeProceso> {
     minutos = _oferta.tiempo; 
     _start = _oferta.tiempo * 60;
 
+    addMarcadores();
     setInitialLocation();
     startTimer();
     _escucharEstadosSolicitud();
+    _obtenerRatingTaxista();
+
+    location.onLocationChanged.listen((LocationData currenLocation) {
+      if (mounted) {
+        print("latitud => "+currenLocation.latitude.toString());
+        print("longitud => "+currenLocation.longitude.toString());
+        _addMarkersMap('Auto', currenLocation.latitude, currenLocation.longitude,
+          Colors.blue[700], Icons.drive_eta, '', 80, false);
+      }
+    });
 
     super.initState();
-    /*BitmapDescriptor.fromAssetImage(
-         ImageConfiguration(devicePixelRatio: 2.5),
-         'assets/img/destination_map_marker.png').then((onValue) {
-            pinLocationIcon = onValue;
-         });
-    */
   }
 
   @override
@@ -259,9 +299,7 @@ class _StateViajeProceso extends State<ViajeProceso> {
         actions: [
           GestureDetector(
             onTap: () async {
-              await _solicitudTaxiViewModel
-              .cancelarSolicitud(documentoID: _solicitudData.documentID);
-              Navigator.pop(context);
+              confirmarCancelarSolicitud('¿ Desea cancelar el pedido ?');
             },
             child: Container(
               width: 100,
@@ -298,7 +336,7 @@ class _StateViajeProceso extends State<ViajeProceso> {
             child: Container(
               //margin: EdgeInsets.only(top: 20),
               width: screenSize.width,
-              height: screenSize.height / 2.0,
+              height: screenSize.height - ((screenSize.height / 3) + 70),
               child: !mostrarMapa
                   ? Center(
                       child: CircularProgressIndicator(),
@@ -329,6 +367,7 @@ class _StateViajeProceso extends State<ViajeProceso> {
             child: Container(
               color: Colors.white,
               width: screenSize.width,
+              height: (screenSize.height / 4) + 30,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -373,17 +412,28 @@ class _StateViajeProceso extends State<ViajeProceso> {
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20),
                     child: BtnAceptar(
-                      activo: _solicitudEscuchar.estado == 2,
+                      activo: _solicitudEscuchar.estado == 2 ||
+                      _solicitudEscuchar.estado == 4,
                       onPress: () async {
                         if(_solicitudEscuchar.estado == 2) {
                           actualizarEstado(3);
-                          enviarNotificacion();
-                        } else {
-                          terminarPedido();
+                        } else if(_solicitudEscuchar.estado == 4) {
+                          actualizarEstado(5);
+                        } else if(_solicitudEscuchar.estado == 5) {
+                          //cambiar esta de finalziado a true
+                          await _solicitudTaxiViewModel
+                          .finalizarPedido(documentID: _solicitudEscuchar.documentID);
+
+                          addPedidosTaxista();
+
+                          mostrarCalificarViaje();
                         }
                       },
                       titulo: _solicitudEscuchar.estado == 2 
                       ? 'He llegado'
+                      : _solicitudEscuchar.estado > 2 &&
+                       _solicitudEscuchar.estado < 5
+                      ? 'Empezar viaje'
                       : 'Terminar viaje',
                     )
                   ),
@@ -393,13 +443,10 @@ class _StateViajeProceso extends State<ViajeProceso> {
             )
         ),
         BtnUbicacionCentrar(
-          bottom: (screenSize.height / 2.5),
+          bottom: (screenSize.height / 4) + 50,
           right: 10,
-          onPress: () async {
-            if (markers.length > 0) {
-              print('CENTRAR MARCADORES');
-              await updateCameraLocation();
-            }
+          onPress: () {
+            _getUserLocation();
           },
         ),
         Positioned(
@@ -433,7 +480,7 @@ class _StateViajeProceso extends State<ViajeProceso> {
   }
 
   void _addMarkersMap(String idMarker, double lat, double long, Color color,
-      icono, String direccion, int width) async {
+      icono, String direccion, int width, bool updateCamera) async {
     final MarkerId markerId = MarkerId(idMarker);
 
     // creating a new MARKER
@@ -450,40 +497,42 @@ class _StateViajeProceso extends State<ViajeProceso> {
       markerList.add(marker); // lista de marcadores para luego centrar en mapa
     });
 
-    if (markers.length > 2) {
-      print('CENTRAR MARCADORESSSSS');
+    if (markers.length > 1 && updateCamera) {
+      print('CENTRAR MARCADORES 1');
       await updateCameraLocation();
     }
+
   }
 
   Future<void> updateCameraLocation() async {
-    print('CENRANDO MARKERS');
+    print('CENTRAR CAMARA');
     GoogleMapController mapController = await _controllerComplete.future;
 
     List<Marker> markerListAux = new List();
 
     if (_solicitudEscuchar.estado == 2) {
-      for (var i = 0; i < (markerList.length-1); i++) {
-        markerListAux.add(markerList[i]);
-      }
+      Marker m1 = markerList.firstWhere((m) => m.markerId.value == 'Auto');
+      print(m1.markerId.value);
+      markerListAux.add(m1);
+      Marker m2 = markerList.firstWhere((m) => m.markerId.value == 'Cliente');
+      print(m2.markerId.value);
+      markerListAux.add(m2);
     }
 
-    if (_solicitudEscuchar.estado == 3) {
-      for (var i = 0; i < markerList.length; i++) {
-        markerListAux.add(markerList[i]);
-      }
-      markerListAux.removeAt(1);
-      final MarkerId markerId = MarkerId('Cliente');
-      setState(() {
-        markers.remove(markerId);
-        _polylines.removeWhere((poli) => poli.polylineId == PolylineId("linea1"));
-      });
+    if (_solicitudEscuchar.estado > 2) {
+      Marker m1 = markerList.firstWhere((m) => m.markerId.value == 'Auto');
+      print(m1.markerId.value);
+      markerListAux.add(m1);
+      Marker m2 = markerList.firstWhere((m) => m.markerId.value == 'Destino');
+      print(m2.markerId.value);
+      markerListAux.add(m2);
     }
 
     LatLngBounds bounds = getBounds(markerListAux);
     //mapController.animateCamera(CameraUpdate.newLatLngBounds(bounds, 100));
 
-    CameraUpdate cameraUpdate = CameraUpdate.newLatLngBounds(bounds, 70);
+    double zoomAux = _solicitudEscuchar.estado == 2 ? _zoom : 100;
+    CameraUpdate cameraUpdate = CameraUpdate.newLatLngBounds(bounds, zoomAux);
 
     return checkCameraLocation(cameraUpdate, mapController);
   }
@@ -640,12 +689,86 @@ class _StateViajeProceso extends State<ViajeProceso> {
       throw 'Could not launch $url';
     }
   }
-  
-  void enviarNotificacion() async {
-    var notificaciones = 
-    Provider.of<PushNotificationProvider>(context, listen: false); 
-    await notificaciones.sendAndRetrieveMessage();
 
+  mostrarCalificarViaje() {
+    print('mostrar calificar viaje');
+    showDialog(
+      context: context,
+      builder: (_) => Material(
+          type: MaterialType.transparency,
+          child: WillPopScope(
+          onWillPop: () {},
+          child: CalificarViaje(
+            titulo: 'Califica al pasajero',
+            elemento: _solicitudEscuchar,
+            accionBoton: () {
+              Navigator.of(context).pushNamedAndRemoveUntil('/dashboard', 
+              (Route<dynamic> route) => false);
+              //Navigator.pop(context);
+            },
+          )
+          ),
+      ),
+    );
+  }
+
+  void confirmarCancelarSolicitud(String mensaje) {
+      showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        var screenSize = MediaQuery.of(context).size;
+        // return object of type Dialog
+        return AlertDialog(
+          title: Text(mensaje),
+          titleTextStyle: TextStyle(
+            fontSize: 25,
+            color: Colors.black
+          ),
+          actions:  <Widget>[
+            Container(
+              width: screenSize.width,
+              padding: EdgeInsets.all(10.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Container(
+                      child: Text('No',
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.red[800],
+                          fontWeight: FontWeight.bold
+                        ),
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      _cancelarSolicitud();
+                    },
+                    child: Container(
+                      child: Text('Si, cancelar',
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.green[800],
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+          ],
+        );
+      },
+    );
+  
   }
 
 }

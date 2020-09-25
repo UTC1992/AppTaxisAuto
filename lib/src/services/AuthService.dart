@@ -27,7 +27,7 @@ class AuthService extends ChangeNotifier {
           notifyListeners();
           return user != null;
       } catch (e) {
-          return e.message;
+          return e.code;
       }
   }
 

@@ -23,7 +23,19 @@ class SolicitudTaxiViewModel extends AuthService{
     var result = await _solicitudTaxiService.getRatingCliente(id);
 
     if (result is String) {
-      print('Error al actualizar ' + result);
+      print('Error al obtener rating ' + result);
+    } else {
+      
+      return result;
+    } 
+    
+  }
+
+  Future getRatingTaxista(String id) async {
+    var result = await _solicitudTaxiService.getRatingTaxista(id);
+
+    if (result is String) {
+      print('Error al obtener rating ' + result);
     } else {
       
       return result;
@@ -89,5 +101,51 @@ class SolicitudTaxiViewModel extends AuthService{
       print('Se cancelo la solicitud');
     }
   }
+
+  Future updateRatingPedidosTaxista({
+    @required String documentID,
+    @required int pedidos,
+  }) async {
+    var result = await _solicitudTaxiService.updateRatingTaxistaPedidos(
+        documentID: documentID, pedidos: pedidos);
+
+    if (result is String) {
+      print('Error al actualizar ' + result);
+    } else {
+      print('Exito al actualizar pedidos');
+    }
+  }
+
+  Future updateRatingLikeCliente({
+    @required String documentID,
+    @required int like,
+    @required int pedidos
+  }) async {
+    var result = await _solicitudTaxiService.updateRatingClienteLike(
+        documentID: documentID, like: like, pedidos: pedidos);
+
+    if (result is String) {
+      print('Error al actualizar ' + result);
+    } else {
+      print('Exito al actualizar estado');
+    }
+  }
+
+  Future updateRatingDisLikeCliente({
+    @required String documentID,
+    @required int dislike,
+    @required int pedidos
+  }) async {
+    var result = await _solicitudTaxiService.updateRatingClienteDisLike(
+        documentID: documentID, dislike: dislike, pedidos: pedidos);
+
+    if (result is String) {
+      print('Error al actualizar ' + result);
+    } else {
+      print('Exito al actualizar estado');
+    }
+  }
+
+
 
 }

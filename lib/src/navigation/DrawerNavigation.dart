@@ -1,4 +1,6 @@
+import 'package:AppTaxisAuto/src/providers/push_notifications_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../ui/view/Perfil.dart';
 import '../ui/view/Viajes.dart';
 import '../ui/view/Solicitudes.dart';
@@ -42,10 +44,82 @@ class _DrawerState extends State<DrawerNavigation> {
     });
   }
 
+  void confirmarCerrarSesion() {
+      showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        var screenSize = MediaQuery.of(context).size;
+        // return object of type Dialog
+        return AlertDialog(
+          title: Text('¿Deseas cerrar la sesión?'),
+          titleTextStyle: TextStyle(
+            fontSize: 25,
+            color: Colors.black
+          ),
+          actions:  <Widget>[
+            Container(
+              width: screenSize.width,
+              padding: EdgeInsets.all(10.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Container(
+                      child: Text('Cancelar',
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.red[800],
+                          fontWeight: FontWeight.bold
+                        ),
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      cerrarSesion();
+                    },
+                    child: Container(
+                      child: Text('Aceptar',
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.green[800],
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+          ],
+        );
+      },
+    );
+  
+  }
+
   cerrarSesion() async {
     await authService.cerrarSesion();
     Navigator.of(context).pushNamedAndRemoveUntil('/bienvenida', 
     (Route<dynamic> route) => false);
+  }
+
+  obtenerToken() async {
+    PushNotificationProvider notificaciones = Provider.of<PushNotificationProvider>(context, listen: false);
+    await notificaciones.updateToken();
+  }
+
+  @override
+  void initState() {
+
+    obtenerToken();
+
+    super.initState();
   }
 
   @override
@@ -99,7 +173,7 @@ class _DrawerState extends State<DrawerNavigation> {
               leading: Icon(Icons.close),
               selected: false,
               onTap: () {
-                cerrarSesion();
+                confirmarCerrarSesion();
               },
             ),
           ],

@@ -27,6 +27,8 @@ class SolicitudTaxiService {
 
   Stream getSolicitudesList() {
       _collectionSolicitud
+      .where('finalizada', isEqualTo: false)
+      .where('cancelada', isEqualTo: false)
       .snapshots().listen((result) {
         if(result.docs.isNotEmpty){
           var solicitudes = result.docs
@@ -54,6 +56,28 @@ class SolicitudTaxiService {
     try {
       var result = await _collectionRating
       .where('idCliente', isEqualTo: documentoID)
+      .get();
+      
+      var data;
+      var id;
+
+      result.docs.forEach((doc) {
+        //print(doc.data);
+        data = doc.data();
+        id = doc.id;
+      });
+
+      Rating rating = Rating.fromJson(data, id);
+      return rating;
+    } catch (e) {
+      return e.toString();
+    }
+  }
+
+  Future getRatingTaxista(String documentoID) async {
+    try {
+      var result = await _collectionRating
+      .where('idTaxista', isEqualTo: documentoID)
       .get();
       
       var data;
@@ -159,6 +183,61 @@ class SolicitudTaxiService {
       await _collectionSolicitud
       .doc(documentID)
       .update({'cancelada': true});
+
+      return true;
+    } catch (e) {
+      return e.toString();
+    }
+  }
+
+  Future updateRatingClienteLike({
+    @required String documentID,
+    @required int like,
+    @required int pedidos
+  }) async {
+    try {
+      await _collectionRating
+      .doc(documentID)
+      .update({
+        'like': like,
+        'pedidos': pedidos,
+      });
+
+      return true;
+    } catch (e) {
+      return e.toString();
+    }
+  }
+
+  Future updateRatingClienteDisLike({
+    @required String documentID,
+    @required int dislike,
+    @required int pedidos
+  }) async {
+    try {
+      await _collectionRating
+      .doc(documentID)
+      .update({
+        'dislike': dislike,
+        'pedidos': pedidos,
+      });
+
+      return true;
+    } catch (e) {
+      return e.toString();
+    }
+  }
+
+  Future updateRatingTaxistaPedidos({
+    @required String documentID,
+    @required int pedidos,
+  }) async {
+    try {
+      await _collectionRating
+      .doc(documentID)
+      .update({
+        'pedidos': pedidos,
+      });
 
       return true;
     } catch (e) {

@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 class Bienvenida extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    var screenSize = MediaQuery.of(context).size;
+
     return Scaffold(
       body: Container(
         //padding: EdgeInsets.symmetric(vertical: 30),
-        width: double.infinity,
+        width: screenSize.width,
         decoration: BoxDecoration(
             gradient: LinearGradient(begin: Alignment.topCenter, colors: [
           Colors.orange[900],
@@ -19,14 +21,19 @@ class Bienvenida extends StatelessWidget {
             SizedBox(
               height: 100,
             ),
-            Padding(
-              padding: EdgeInsets.all(20),
-              child: Column(
+            Container(
+              //padding: EdgeInsets.all(20),
+              height: screenSize.height / 3,
+              child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Text(
                     'Bienvenido',
-                    style: TextStyle(color: Colors.white, fontSize: 40),
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 40,
+                        fontWeight: FontWeight.bold),
                   )
                 ],
               ),
@@ -44,60 +51,62 @@ class Bienvenida extends StatelessWidget {
                 child: Padding(
                   padding: EdgeInsets.all(30),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
+                      GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).pushNamed('/registro');
+                          },
+                          child: Container(
+                            height: 50,
+                            alignment: Alignment.center,
+                            child: Center(
+                              child: Text(
+                                'Regístrate',
+                                style: TextStyle(
+                                    color: Colors.orange[900],
+                                    fontSize: 30,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          )),
                       SizedBox(
-                        height: 60,
+                        height: 20,
                       ),
                       Container(
-                        padding: EdgeInsets.all(20),
-                        child: Column(
-                          children: <Widget>[
-                            GestureDetector(
-                                onTap: () {
-                                  Navigator.of(context).pushNamed('/login');
-                                },
-                                child: Container(
-                                  height: 50,
-                                  margin: EdgeInsets.symmetric(horizontal: 50),
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(50),
-                                      color: Colors.orange[900]),
-                                  child: Center(
-                                    child: Text(
-                                      'Iniciar sesión',
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                )),
-                            SizedBox(
-                              height: 20,
-                            ),
-                            GestureDetector(
-                                onTap: () {
-                                  Navigator.of(context).pushNamed('/registro');
-                                },
-                                child: Container(
-                                  height: 50,
-                                  margin: EdgeInsets.symmetric(horizontal: 50),
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(50),
-                                      color: Colors.orange[900]),
-                                  child: Center(
-                                    child: Text(
-                                      'Registrate',
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                ))
-                          ],
+                        height: 50,
+                        alignment: Alignment.center,
+                        child: Center(
+                          child: Text(
+                            '¿ Ya tienes cuenta ?',
+                            style: TextStyle(
+                                color: Colors.orange[900],
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold),
+                          ),
                         ),
-                      )
+                      ),
+                      GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).pushNamed('/login');
+                          },
+                          child: Container(
+                            height: 50,
+                            margin: EdgeInsets.symmetric(horizontal: 60),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(50),
+                                color: Colors.orange[900]),
+                            child: Center(
+                              child: Text(
+                                'Iniciar sesión',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          )),
                     ],
                   ),
                 ),

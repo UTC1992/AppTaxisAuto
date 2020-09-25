@@ -88,46 +88,4 @@ class PushNotificationProvider with ChangeNotifier {
 
   }
 
-  Future<Map<String, dynamic>> sendAndRetrieveMessage() async {
-    /*await _firebaseMessaging.requestNotificationPermissions(
-      const IosNotificationSettings(sound: true, badge: true, alert: true, provisional: false),
-    );
-    */
-    print('ENVIANDO NOTIFICACION');
-
-    await http.post(
-      'https://fcm.googleapis.com/fcm/send',
-      headers: <String, String>{
-        'Content-Type': 'application/json',
-        'Authorization': 'key=$serverToken',
-      },
-      body: jsonEncode(
-      <String, dynamic>{
-        'notification': <String, dynamic>{
-          'body': 'this is a body',
-          'title': 'this is a title'
-        },
-        'priority': 'high',
-        'data': <String, dynamic>{
-          'click_action': 'FLUTTER_NOTIFICATION_CLICK',
-          'id': '1',
-          'status': 'done'
-        },
-        'to': await _firebaseMessaging.getToken(),
-      },
-      ),
-    );
-
-    final Completer<Map<String, dynamic>> completer =
-      Completer<Map<String, dynamic>>();
-
-    _firebaseMessaging.configure(
-      onMessage: (Map<String, dynamic> message) async {
-        completer.complete(message);
-      },
-    );
-
-    return completer.future;
-  }
-  
 }

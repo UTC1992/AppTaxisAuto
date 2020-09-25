@@ -17,7 +17,6 @@ import '../../widgets/botones/BtnBack.dart';
 import '../../../viewmodel/SolicitudTaxiViewModel.dart';
 import '../../../models/Oferta.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:android_intent/android_intent.dart';
 import 'package:http/http.dart' as http;
 
 const keyApiGoogle = "AIzaSyC_CYna_nySeFMtjj--GIJIB6CvHRm0pE4";
@@ -53,7 +52,7 @@ class _SolicitudState extends State<SolicitudDatos> {
   bool mostrarMapa = false;
   bool liteModeMap = false;
 
-  Map<MarkerId, Marker> markers =
+  Map<MarkerId, Marker> markersListMap =
       <MarkerId, Marker>{}; // CLASS MEMBER, MAP OF MARKS
   List<Marker> markerList = new List();
 
@@ -154,42 +153,6 @@ class _SolicitudState extends State<SolicitudDatos> {
     _taxista = widget.data.taxista;
     setInitialLocation();
     super.initState();
-    /*BitmapDescriptor.fromAssetImage(
-         ImageConfiguration(devicePixelRatio: 2.5),
-         'assets/img/destination_map_marker.png').then((onValue) {
-            pinLocationIcon = onValue;
-         });
-    */
-  }
-  
-
-  Future _checkGps() async {
-    if (!(await Geolocator().isLocationServiceEnabled())) {
-      if (Theme.of(context).platform == TargetPlatform.android) {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text("Can't get gurrent location"),
-              content:
-                  const Text('Please make sure you enable GPS and try again'),
-              actions: <Widget>[
-                FlatButton(
-                  child: Text('Ok'),
-                  onPressed: () {
-                    final AndroidIntent intent = AndroidIntent(
-                        action: 'android.settings.LOCATION_SOURCE_SETTINGS');
-
-                    intent.launch();
-                    Navigator.of(context, rootNavigator: true).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        );
-      }
-    }
   }
 
   @override
@@ -205,8 +168,10 @@ class _SolicitudState extends State<SolicitudDatos> {
             child: Container(
               //margin: EdgeInsets.only(top: 20),
               width: screenSize.width,
-              height: screenSize.height / 2,
-              child: !mostrarMapa
+              height: screenSize.height - ((screenSize.height / 3) + 50),
+              child: !mostrarMapa && 
+                    _polylines != null && 
+                    markerList != null
                   ? Center(
                       child: CircularProgressIndicator(),
                     )
@@ -225,7 +190,7 @@ class _SolicitudState extends State<SolicitudDatos> {
                         zoom: _zoom,
                       ),
                       onMapCreated: _onMapCreated,
-                      markers: Set<Marker>.of(markers.values),
+                      markers: Set<Marker>.of(markersListMap.values),
                       polylines: _polylines,
                     ),
             ),
@@ -235,6 +200,10 @@ class _SolicitudState extends State<SolicitudDatos> {
             bottom: 0,
             child: Container(
               width: screenSize.width,
+              height: (screenSize.height / 3) + 50,
+              decoration: BoxDecoration(
+                color: Colors.white
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -256,7 +225,7 @@ class _SolicitudState extends State<SolicitudDatos> {
                           _mostrarConfirmacionOferta(_solicitudData.tarifa);
                         },
                         titulo:
-                            'Aceptar por \$' + _solicitudData.tarifa.toString(),
+                            'Aceptar por \$ ' + _solicitudData.tarifa.toString(),
                       )),
                   SizedBox(
                     height: 10,
@@ -313,17 +282,17 @@ class _SolicitudState extends State<SolicitudDatos> {
               ),
             )),
         BtnUbicacionCentrar(
-          bottom: (screenSize.height / 2) + 10,
+          bottom: screenSize.height / 2.5,
           right: 10,
           onPress: () async {
-            if (markers.length > 2) {
+            if (markersListMap.length > 2) {
               print('CENTRAR MARCADORESSSSS');
               await updateCameraLocation();
             }
           },
         ),
         BtnBack(
-            top: 30,
+            top: screenSize.height / 12,
             left: 10,
             onPress: () {
               Navigator.pop(context);
@@ -346,11 +315,11 @@ class _SolicitudState extends State<SolicitudDatos> {
 
     setState(() {
       // adding a new marker to map
-      markers[markerId] = marker;
+      markersListMap[markerId] = marker;
       markerList.add(marker); // lista de marcadores para luego centrar en mapa
     });
 
-    if (markers.length > 2) {
+    if (markersListMap.length > 2) {
       print('CENTRAR MARCADORESSSSS');
       await updateCameraLocation();
     }
@@ -363,7 +332,7 @@ class _SolicitudState extends State<SolicitudDatos> {
     LatLngBounds bounds = getBounds(markerList);
     //mapController.animateCamera(CameraUpdate.newLatLngBounds(bounds, 100));
 
-    CameraUpdate cameraUpdate = CameraUpdate.newLatLngBounds(bounds, 70);
+    CameraUpdate cameraUpdate = CameraUpdate.newLatLngBounds(bounds, _zoom);
 
     return checkCameraLocation(cameraUpdate, mapController);
   }
