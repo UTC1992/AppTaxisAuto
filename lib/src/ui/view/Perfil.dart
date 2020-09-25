@@ -15,7 +15,7 @@ class _PerfilState extends State<Perfil> {
   _getUsuarioLogeado() async {
     print('Obtener usuario.............');
     User user = await _taxistaViewModel.getTaxistaLogeado();
-    if (user != null) {
+    if (user != null && mounted) {
       _taxistaViewModel.getTaxistaByEmail(user.email).listen((event) {
         setState(() {
           taxista = event;

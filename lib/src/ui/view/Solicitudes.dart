@@ -1,7 +1,5 @@
-import 'dart:async';
 import 'package:AppTaxisAuto/src/models/ArgsSolicitudOferta.dart';
 import 'package:AppTaxisAuto/src/models/ArgumentosSolicitudDatos.dart';
-import 'package:AppTaxisAuto/src/models/Oferta.dart';
 import 'package:AppTaxisAuto/src/models/SolicitudTaxi.dart';
 import 'package:AppTaxisAuto/src/models/Taxista.dart';
 import 'package:AppTaxisAuto/src/services/SolicitudTaxiService.dart';
@@ -54,17 +52,25 @@ class _SolicitudState extends State<Solicitudes> with TickerProviderStateMixin {
 
   void escucharSolicitudes() {
     _solicitudTaxiService.getSolicitudesList().listen((dataList) {
-      print('ESCUCHANDO SOLICITUDES');
-      List<SolicitudTaxi> updateList = dataList;
-      if (updateList != null && updateList.length > 0) {
-        if(mounted) {
-          setState(() {
-            _solicitudes = updateList;
-          });
+        print('ESCUCHANDO SOLICITUDES');
+        List<SolicitudTaxi> updateList = dataList;
+        if (updateList != null && updateList.length > 0) {
+          if(mounted) {
+            setState(() {
+              _solicitudes = updateList;
+            });
+          }
+          
         }
-        
+      },
+      onError: (error) {
+        print(error.toString());
+      },
+      cancelOnError: false,
+      onDone: () {
+        //cuando el strem finalice de enviar datos
       }
-    });
+    );
   }
 
   @override
@@ -72,6 +78,23 @@ class _SolicitudState extends State<Solicitudes> with TickerProviderStateMixin {
     setInitialLocation();
     _getUsuarioLogeado();
     escucharSolicitudes();
+    
+    location.onLocationChanged.listen((LocationData currenLocation) async {
+      if (mounted && taxista != null) {
+        print("latitud => "+currenLocation.latitude.toString());
+        print("longitud => "+currenLocation.longitude.toString());
+
+        await _taxistaViewModel
+          .updateUbicacionGPS(
+            documentID: taxista.documentId, 
+            latitude: currenLocation.latitude, 
+            longitude: currenLocation.longitude);
+
+        print('Acutlizando Ubicacion en Solicitudes');
+
+      }
+    });
+
     super.initState();
   }
 

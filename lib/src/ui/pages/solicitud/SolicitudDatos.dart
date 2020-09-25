@@ -45,7 +45,7 @@ class _SolicitudState extends State<SolicitudDatos> {
   PermissionStatus _permissionGranted;
   LocationData _locationData;
 
-  final double _zoom = 16;
+  double _zoom = 16;
   Completer<GoogleMapController> _controllerComplete = Completer();
 
   ///variable para mostrar el mapa cuando este listo

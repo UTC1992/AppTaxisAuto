@@ -7,6 +7,7 @@ class Taxista {
   String documentId;
   bool estado;
   String urlImagen;
+  Map ubicacionGPS;
 
   Taxista({
     this.nombre,
@@ -16,6 +17,7 @@ class Taxista {
     this.ciudad,
     this.estado,
     this.urlImagen,
+    this.ubicacionGPS,
     });
 
   Map<String, dynamic> toMap() => {
@@ -26,6 +28,7 @@ class Taxista {
     'ciudad': ciudad,
     'estado': estado,
     'urlImagen':'',
+    'ubicacionGPS':[],
   };
 
   Taxista.fromJson(Map<String, dynamic> json, String documentoID)
@@ -36,6 +39,10 @@ class Taxista {
         ciudad = json['ciudad'],
         telefono = json['telefono'],
         estado = json['estado'],
-        urlImagen = json['urlImagen'];
+        urlImagen = json['urlImagen'],
+        ubicacionGPS = {
+          'latitude' : json['ubicacionGPS']['latitude'],
+          'longitude' : json['ubicacionGPS']['longitude'],
+        };
 
 }

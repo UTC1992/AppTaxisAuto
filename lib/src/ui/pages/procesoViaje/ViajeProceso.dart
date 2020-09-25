@@ -9,6 +9,7 @@ import 'package:AppTaxisAuto/src/providers/push_notifications_provider.dart';
 import 'package:AppTaxisAuto/src/services/SolicitudTaxiService.dart';
 import 'package:AppTaxisAuto/src/ui/widgets/calificar/CalificarViaje.dart';
 import 'package:AppTaxisAuto/src/ui/widgets/solicitudes/ItemSolicitudProceso.dart';
+import 'package:AppTaxisAuto/src/viewmodel/TaxistaViewModel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:location/location.dart';
@@ -38,6 +39,9 @@ class _StateViajeProceso extends State<ViajeProceso> {
   //solicitud view model
   SolicitudTaxiService _solicitudTaxiService = SolicitudTaxiService();
   SolicitudTaxiViewModel _solicitudTaxiViewModel = SolicitudTaxiViewModel();
+
+  //taxista viewModel
+  TaxistaViewModel _taxistaViewModel = TaxistaViewModel();
 
   ///variable para obtener ubicacion
   Location location = new Location();
@@ -273,12 +277,20 @@ class _StateViajeProceso extends State<ViajeProceso> {
     _escucharEstadosSolicitud();
     _obtenerRatingTaxista();
 
-    location.onLocationChanged.listen((LocationData currenLocation) {
+    location.onLocationChanged.listen((LocationData currenLocation) async {
       if (mounted) {
         print("latitud => "+currenLocation.latitude.toString());
         print("longitud => "+currenLocation.longitude.toString());
         _addMarkersMap('Auto', currenLocation.latitude, currenLocation.longitude,
           Colors.blue[700], Icons.drive_eta, '', 80, false);
+
+        await _taxistaViewModel
+          .updateUbicacionGPS(
+            documentID: widget.data.solicitudTaxi.idTaxista, 
+            latitude: currenLocation.latitude, 
+            longitude: currenLocation.longitude);
+
+        print('Acutlizando Ubicacion en Viaje');
       }
     });
 

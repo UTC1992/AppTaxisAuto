@@ -146,4 +146,26 @@ class TaxistaService {
     }
   }
 
+  Future updateUbicacion({
+    @required String documentID, 
+    @required double latitude,
+    @required double longitude,
+  }) async {
+    try {
+      await _collectionTaxista
+      .doc(documentID)
+      .update({
+        'ubicacionGPS' : {
+          'latitude' : latitude,
+          'longitude' :longitude,
+        },
+
+      });
+
+      return true;
+    } catch (e) {
+      return e.toString();
+    }
+  }
+
 }

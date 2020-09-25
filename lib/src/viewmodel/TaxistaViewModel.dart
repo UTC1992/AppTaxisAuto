@@ -152,5 +152,20 @@ class TaxistaViewModel {
 
   }
 
+  Future updateUbicacionGPS({
+    @required String documentID,
+    @required double latitude,
+    @required double longitude,
+  }) async {
+    var result = await _taxistaService.
+    updateUbicacion(documentID: documentID, latitude: latitude, longitude: longitude);
+
+    if (result is String) {
+      print('Error al actualizar ' + result);
+    } else {
+      print('Exito al actualizar ubicacion');
+    }
+
+  }
 
 }
