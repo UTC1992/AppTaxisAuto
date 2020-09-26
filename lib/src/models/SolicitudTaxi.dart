@@ -16,6 +16,7 @@ class SolicitudTaxi {
   int estado;
   Timestamp fechaCreacion;
   Timestamp fechaOrdenar;
+  Map motivoCancelar;
 
   SolicitudTaxi({
     this.clienteID,
@@ -31,7 +32,8 @@ class SolicitudTaxi {
     this.finalizada,
     this.estado,
     this.fechaCreacion,
-    this.fechaOrdenar
+    this.fechaOrdenar,
+    this.motivoCancelar,
   });
 
   Map<String, dynamic> toMap() => {
@@ -53,7 +55,11 @@ class SolicitudTaxi {
     'finalizada': finalizada,
     'estado': estado,
     'fechaCreacion': fechaCreacion,
-    'fechaOrdenar': fechaOrdenar
+    'fechaOrdenar': fechaOrdenar,
+    'motivoCancelar' : {
+      'cliente' : '',
+      'taxista' :  '',
+    },
   };
 
    SolicitudTaxi.fromJson(Map<String, dynamic> json, String documentoID)
@@ -76,6 +82,10 @@ class SolicitudTaxi {
         finalizada = json['finalizada'],
         estado = json['estado'],
         fechaCreacion = json['fechaCreacion'],
-        fechaOrdenar = json['fechaOrdenar'];
+        fechaOrdenar = json['fechaOrdenar'],
+        motivoCancelar = {
+          'cliente' : json['motivoCancelar']['cliente'],
+          'taxista' : json['motivoCancelar']['taxista'],
+        };
 
 }

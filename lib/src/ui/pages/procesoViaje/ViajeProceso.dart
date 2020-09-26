@@ -8,6 +8,7 @@ import 'package:AppTaxisAuto/src/models/SolicitudTaxi.dart';
 import 'package:AppTaxisAuto/src/providers/push_notifications_provider.dart';
 import 'package:AppTaxisAuto/src/services/SolicitudTaxiService.dart';
 import 'package:AppTaxisAuto/src/ui/widgets/calificar/CalificarViaje.dart';
+import 'package:AppTaxisAuto/src/ui/widgets/cancelacion/AlertaCancelacion.dart';
 import 'package:AppTaxisAuto/src/ui/widgets/solicitudes/ItemSolicitudProceso.dart';
 import 'package:AppTaxisAuto/src/viewmodel/TaxistaViewModel.dart';
 import 'package:flutter/material.dart';
@@ -206,8 +207,8 @@ class _StateViajeProceso extends State<ViajeProceso> {
             
           }
 
-          if (objeto.cancelada) {
-
+          if (objeto.cancelada && objeto.motivoCancelar['cliente'] != "") {
+            mostrarClienteCanceloPedido();
           }
 
         });
@@ -277,13 +278,14 @@ class _StateViajeProceso extends State<ViajeProceso> {
     _escucharEstadosSolicitud();
     _obtenerRatingTaxista();
 
+    
     location.onLocationChanged.listen((LocationData currenLocation) async {
       if (mounted) {
         print("latitud => "+currenLocation.latitude.toString());
         print("longitud => "+currenLocation.longitude.toString());
         _addMarkersMap('Auto', currenLocation.latitude, currenLocation.longitude,
           Colors.blue[700], Icons.drive_eta, '', 80, false);
-
+        /*
         await _taxistaViewModel
           .updateUbicacionGPS(
             documentID: widget.data.solicitudTaxi.idTaxista, 
@@ -291,6 +293,7 @@ class _StateViajeProceso extends State<ViajeProceso> {
             longitude: currenLocation.longitude);
 
         print('Acutlizando Ubicacion en Viaje');
+        */
       }
     });
 
@@ -781,6 +784,28 @@ class _StateViajeProceso extends State<ViajeProceso> {
       },
     );
   
+  }
+
+  mostrarClienteCanceloPedido() {
+    print('mostrar cancelacion por el cliente');
+    showDialog(
+      context: context,
+      builder: (_) => Material(
+          type: MaterialType.transparency,
+          child: WillPopScope(
+          onWillPop: () {},
+          child: AlertaCancelacion(
+            titulo: 'El cliente cancelo el pedido',
+            elemento: _solicitudEscuchar,
+            accionBoton: () {
+              Navigator.of(context).pushNamedAndRemoveUntil('/dashboard', 
+              (Route<dynamic> route) => false);
+              //Navigator.pop(context);
+            },
+          )
+          ),
+      ),
+    );
   }
 
 }

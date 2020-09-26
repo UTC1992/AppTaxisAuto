@@ -5,11 +5,15 @@ class BtnAceptar extends StatefulWidget {
   final String titulo;
   final bool activo;
   final Function onPress;
+  final double ancho;
+  final double alto;
 
   BtnAceptar({
     @required this.titulo,
     @required this.onPress,
-    @required this.activo
+    @required this.activo,
+    this.ancho,
+    this.alto
   });
 
   @override
@@ -22,6 +26,8 @@ class _StateBtnAceptar extends State<BtnAceptar> {
     return GestureDetector(
       onTap: widget.onPress,
       child: Container(
+        height: widget.alto,
+        width: widget.ancho,
         decoration: BoxDecoration(
           color: widget.activo
               ? Colors.green[700]

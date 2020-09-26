@@ -94,7 +94,7 @@ class _SolicitudState extends State<Solicitudes> with TickerProviderStateMixin {
 
       }
     });
-
+    
     super.initState();
   }
 
