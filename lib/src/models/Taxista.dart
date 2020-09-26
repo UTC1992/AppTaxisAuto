@@ -7,7 +7,9 @@ class Taxista {
   String documentId;
   bool estado;
   String urlImagen;
+  Map auto;
   Map ubicacionGPS;
+  
 
   Taxista({
     this.nombre,
@@ -17,6 +19,7 @@ class Taxista {
     this.ciudad,
     this.estado,
     this.urlImagen,
+    this.auto,
     this.ubicacionGPS,
     });
 
@@ -28,6 +31,7 @@ class Taxista {
     'ciudad': ciudad,
     'estado': estado,
     'urlImagen':'',
+    'auto': [],
     'ubicacionGPS':[],
   };
 
@@ -40,6 +44,11 @@ class Taxista {
         telefono = json['telefono'],
         estado = json['estado'],
         urlImagen = json['urlImagen'],
+        auto = {
+          'marca' : json['auto']['marca'],
+          'modelo' : json['auto']['modelo'],
+          'placa' : json['auto']['placa'],
+        },
         ubicacionGPS = {
           'latitude' : json['ubicacionGPS']['latitude'],
           'longitude' : json['ubicacionGPS']['longitude'],
