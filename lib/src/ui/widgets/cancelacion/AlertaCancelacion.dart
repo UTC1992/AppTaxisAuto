@@ -1,9 +1,5 @@
-import 'package:AppTaxisAuto/src/models/Cliente.dart';
-import 'package:AppTaxisAuto/src/models/Rating.dart';
 import 'package:AppTaxisAuto/src/models/SolicitudTaxi.dart';
-import 'package:AppTaxisAuto/src/services/SolicitudTaxiService.dart';
 import 'package:AppTaxisAuto/src/ui/widgets/botones/BtnAceptar.dart';
-import 'package:AppTaxisAuto/src/viewmodel/SolicitudTaxiViewModel.dart';
 import 'package:flutter/material.dart';
 
 class AlertaCancelacion extends StatefulWidget {

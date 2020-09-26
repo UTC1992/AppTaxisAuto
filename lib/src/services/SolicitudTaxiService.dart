@@ -182,7 +182,13 @@ class SolicitudTaxiService {
     try {
       await _collectionSolicitud
       .doc(documentID)
-      .update({'cancelada': true});
+      .update({
+        'cancelada': true,
+        'motivoCancelar': {
+          'cliente' : '',
+          'taxista' : 'Taxi no disponible'
+        }
+      });
 
       return true;
     } catch (e) {
