@@ -41,3 +41,7 @@ app.*.map.json
 
 # Exceptions to above rules.
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
+
+#archivo con datos de la firma
+key.properties
+*.jks

@@ -23,7 +23,7 @@ class _NavigationAppState extends State<NavigationApp> {
           //home: Landing(),
           initialRoute: '/',
           theme: ThemeData(
-              primaryColor: Colors.green[700], accentColor: Colors.green[600]),
+              primaryColor: Colors.orange[700], accentColor: Colors.orange[600]),
           onGenerateRoute: RouteGenerator.generateRoute,
         );
   }
