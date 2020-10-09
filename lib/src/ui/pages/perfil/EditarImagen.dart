@@ -41,11 +41,16 @@ class _EditarImagenState extends State<EditarImagen> {
   }
 
   Future getImage() async {
-    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+    try {
+      final pickedFile = await picker.getImage(source: ImageSource.gallery);
 
-    setState(() {
-      _imagen = File(pickedFile.path);
-    });
+      setState(() {
+        _imagen = File(pickedFile.path);
+      });
+    } catch (e) {
+      print(e.toString());
+    }
+    
   }
 
   @override
@@ -55,14 +60,12 @@ class _EditarImagenState extends State<EditarImagen> {
         title: Text('Subir imagen'),
       ),
       body: getContainer(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: getImage,
-        child: Icon(Icons.camera_alt),
-      ),
+      
     );
   }
 
   Widget getContainer() {
+    var screenSize = MediaQuery.of(context).size;
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(color: Colors.white),
@@ -76,21 +79,31 @@ class _EditarImagenState extends State<EditarImagen> {
               ),
               Padding(
                 padding: EdgeInsets.all(10),
-                child: Text('FOTOGRAFÍA'),
+                child: Text('Fotografía',
+                  style: TextStyle(
+                    fontSize: 18
+                  ),
+                ),
               ),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20),
                 child: Container(
-                  width: 300,
-                  height: 300,
+                  width: screenSize.width * 0.7,
+                  height: screenSize.height * 0.4,
                   decoration: BoxDecoration(
                     color: Colors.black,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: urlImagen != ''
-                      ? Image.network(urlImagen)
+                      ? Padding(
+                          padding: EdgeInsets.all(5.0),
+                          child: Image.network(urlImagen)
+                        )
                       : _imagen != null
-                          ? Image.file(_imagen)
+                          ? Padding(
+                              padding: EdgeInsets.all(5.0),
+                              child: Image.file(_imagen),
+                            )
                           : Center(
                               child: Text(
                               'Seleccione una imagen',
@@ -106,10 +119,43 @@ class _EditarImagenState extends State<EditarImagen> {
               ),
               GestureDetector(
                 onTap: () {
+                  if (urlImagen != '' || _imagen != null) {
+                    deleteImagen();
+                  } else {
+                    getImage();
+                  }
+                },
+                child: Container(
+                  width: screenSize.width * 0.16,
+                  height: screenSize.width * 0.16,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: urlImagen != '' || _imagen != null
+                      ? Colors.red[400]
+                      : Colors.blue[300], 
+                      width: 3),
+                    borderRadius: BorderRadius.circular(360.0),
+                  ),
+                  child: urlImagen != '' || _imagen != null
+                          ? Icon(Icons.delete_forever, 
+                            size: screenSize.width * 0.1,
+                            color: Colors.red[400],
+                          )
+                          : Icon(Icons.camera_alt, 
+                            size: screenSize.width * 0.1,
+                            color: Colors.blue[500],
+                          ),
+                ),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              GestureDetector(
+                onTap: () {
                   uploadFile();
                 },
                 child: Container(
-                  height: 50,
+                  height: 45,
                   margin: EdgeInsets.symmetric(horizontal: 50),
                   decoration: BoxDecoration(
                     color: Colors.green[600],
@@ -118,32 +164,6 @@ class _EditarImagenState extends State<EditarImagen> {
                   child: Center(
                     child: Text(
                       'Actualizar',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              GestureDetector(
-                onTap: () {
-                  deleteImagen();
-                },
-                child: Container(
-                  height: 40,
-                  margin: EdgeInsets.symmetric(horizontal: 80),
-                  decoration: BoxDecoration(
-                    color: Colors.red[700],
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Center(
-                    child: Text(
-                      'Eliminar',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -198,7 +218,11 @@ class _EditarImagenState extends State<EditarImagen> {
         print(onError);
       });
     } else {
-    
+      setState(() {
+        urlImagen = '';
+        _imagen = null;
+        _uploadedFileURL = '';
+      });
     }
   } 
 }

@@ -1,4 +1,7 @@
+import 'package:AppTaxisAuto/src/models/Taxista.dart';
 import 'package:AppTaxisAuto/src/providers/push_notifications_provider.dart';
+import 'package:AppTaxisAuto/src/viewmodel/TaxistaViewModel.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../ui/view/Perfil.dart';
@@ -13,8 +16,23 @@ class DrawerNavigation extends StatefulWidget {
 class _DrawerState extends State<DrawerNavigation> {
 
   AuthService authService = AuthService();
-
   int _selectDrawerItem = 0;
+
+  TaxistaViewModel _taxistaViewModel = TaxistaViewModel();
+  Taxista taxista;
+
+  _getUsuarioLogeado() async {
+    print('Obtener usuario.............');
+    User user = await _taxistaViewModel.getTaxistaLogeado();
+    if (user != null && mounted) {
+      _taxistaViewModel.getTaxistaByEmail(user.email).listen((event) {
+        setState(() {
+          taxista = event;
+        });
+       });
+    }
+    
+  }
 
   _getDrawerItemWidget(int posicion) {
     switch(posicion) {
@@ -53,7 +71,7 @@ class _DrawerState extends State<DrawerNavigation> {
         return AlertDialog(
           title: Text('¿Deseas cerrar la sesión?'),
           titleTextStyle: TextStyle(
-            fontSize: 25,
+            fontSize: 18,
             color: Colors.black
           ),
           actions:  <Widget>[
@@ -71,7 +89,7 @@ class _DrawerState extends State<DrawerNavigation> {
                     child: Container(
                       child: Text('Cancelar',
                         style: TextStyle(
-                          fontSize: 20,
+                          fontSize: 16,
                           color: Colors.red[800],
                           fontWeight: FontWeight.bold
                         ),
@@ -85,7 +103,7 @@ class _DrawerState extends State<DrawerNavigation> {
                     child: Container(
                       child: Text('Aceptar',
                         style: TextStyle(
-                          fontSize: 20,
+                          fontSize: 16,
                           color: Colors.green[800],
                           fontWeight: FontWeight.bold,
                         ),
@@ -118,6 +136,7 @@ class _DrawerState extends State<DrawerNavigation> {
   void initState() {
 
     obtenerToken();
+    _getUsuarioLogeado();
 
     super.initState();
   }
@@ -133,18 +152,51 @@ class _DrawerState extends State<DrawerNavigation> {
           padding: EdgeInsets.zero,
           children: <Widget>[
             UserAccountsDrawerHeader(
-              accountName: Text('Omar Guanoluisa'),
-              accountEmail: Text('omar@gmail.com'),
-              currentAccountPicture: CircleAvatar(
-                backgroundColor: Colors.green[700],
-                child: Text(
-                  'OG',
-                  style: TextStyle(fontSize: 30),
+              accountName: Text(
+                taxista != null 
+                ? taxista.nombre
+                : 'Usuario',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16
                 ),
               ),
+              accountEmail: Text(
+                taxista != null 
+                ? taxista.email
+                : '@',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16
+                ),
+              ),
+              currentAccountPicture: 
+                taxista != null
+                ? taxista.urlImagen != ''
+                  ? CircleAvatar(
+                      radius: 360.0,
+                      backgroundImage: NetworkImage(taxista.urlImagen),
+                      backgroundColor: Colors.transparent,
+                    )
+                  : CircleAvatar(
+                    radius: 360.0,
+                    backgroundColor: Colors.white54,
+                    child:  taxista != null && taxista.nombre != '' 
+                            ?  Text(
+                                taxista.nombre[0].toUpperCase() 
+                                + taxista.nombre[1].toUpperCase(),
+                                style: TextStyle(fontSize: 30),)
+                            : Text('Yo', style: TextStyle(fontSize: 30)),
+                  )
+                : null
             ),
             ListTile(
-              title: Text('Solicitudes'),
+              title: Text(
+                'Solicitudes',
+                style: TextStyle(
+                  fontSize: 16
+                ),
+                ),
               leading: Icon(Icons.view_list),
               selected: (0 == _selectDrawerItem),
               onTap: () {
@@ -152,7 +204,11 @@ class _DrawerState extends State<DrawerNavigation> {
               },
             ),
             ListTile(
-              title: Text('Viajes'),
+              title: Text('Viajes',
+                style: TextStyle(
+                  fontSize: 16
+                ),
+              ),
               leading: Icon(Icons.airline_seat_recline_extra),
               selected: (1 == _selectDrawerItem),
               onTap: () {
@@ -161,7 +217,11 @@ class _DrawerState extends State<DrawerNavigation> {
             ),
             Divider(),
             ListTile(
-              title: Text('Perfil'),
+              title: Text('Perfil',
+                style: TextStyle(
+                  fontSize: 16
+                ),
+              ),
               leading: Icon(Icons.account_circle),
               selected: (2 == _selectDrawerItem),
               onTap: () {
@@ -169,7 +229,11 @@ class _DrawerState extends State<DrawerNavigation> {
               },
             ),
             ListTile(
-              title: Text('Cerrar sesión'),
+              title: Text('Cerrar sesión',
+                style: TextStyle(
+                  fontSize: 16
+                ),
+              ),
               leading: Icon(Icons.close),
               selected: false,
               onTap: () {
