@@ -30,7 +30,7 @@ class TaxistaService {
         var data;
         var id;
         result.docs.forEach((res) {
-          print(res.data()['nombre']);
+          print(res.data());
           data = res.data();
           id = res.id;
         });

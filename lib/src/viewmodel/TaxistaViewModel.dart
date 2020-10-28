@@ -87,8 +87,10 @@ class TaxistaViewModel {
 
     if (result is String) {
       print('Error al reautenticar '+ result);
+      return result;
     } else {
       print('Se reautentico con exito');
+      return true;
     }
 
   }
@@ -102,7 +104,7 @@ class TaxistaViewModel {
     if (result is String) {
       print('Error al actualizar ' + result);
     } else {
-      print('Exito al actualizar correo');
+      print('Exito al actualizar correo perfil');
     }
 
   }
@@ -118,7 +120,7 @@ class TaxistaViewModel {
     if (result is String) {
       print('Error al actualizar ' + result);
     } else {
-      print('Exito al actualizar correo');
+      print('Exito al actualizar correo taxista');
     }
 
   }

@@ -31,8 +31,8 @@ class Taxista {
     'ciudad': ciudad,
     'estado': estado,
     'urlImagen':'',
-    'auto': [],
-    'ubicacionGPS':[],
+    'auto': auto,
+    'ubicacionGPS': ubicacionGPS,
   };
 
   Taxista.fromJson(Map<String, dynamic> json, String documentoID)
@@ -50,8 +50,8 @@ class Taxista {
           'placa' : json['auto']['placa'],
         },
         ubicacionGPS = {
-          'latitude' : json['ubicacionGPS']['latitude'],
-          'longitude' : json['ubicacionGPS']['longitude'],
+          'latitude' : json['ubicacionGPS']['latitude'] != null ? json['ubicacionGPS']['latitude'] : '',
+          'longitude' : json['ubicacionGPS']['longitude'] != null ? json['ubicacionGPS']['longitude'] : '',
         };
 
 }

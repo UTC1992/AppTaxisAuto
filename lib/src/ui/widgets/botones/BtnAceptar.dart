@@ -26,23 +26,20 @@ class _StateBtnAceptar extends State<BtnAceptar> {
     return GestureDetector(
       onTap: widget.onPress,
       child: Container(
-        height: widget.alto,
         width: widget.ancho,
+        height: widget.alto,
         decoration: BoxDecoration(
           color: widget.activo
-              ? Colors.green[700]
+              ? Theme.of(context).buttonColor
               : Colors.grey,
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(20),
         ),
         child: Center(
-            child: Padding(
-          padding: EdgeInsets.all(15.0),
-          child: Text(
+            child: Text(
             widget.titulo,
             style: TextStyle(
                 fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-          ),
-        )),
+          ),),
       ),
     );
   }

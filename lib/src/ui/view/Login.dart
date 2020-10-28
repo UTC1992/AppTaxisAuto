@@ -36,17 +36,17 @@ class _FormLoginState extends State<FormLogin> {
         Navigator.of(context).pushNamedAndRemoveUntil('/dashboard', 
         (Route<dynamic> route) => false);
       } else {
-        mostrarErrorEnLogin('Ocurrio un error al iniciar sesión, intentelo nuevamente por favor');
+        mostrarError('Ocurrio un error al iniciar sesión, intentelo nuevamente por favor');
       }
     } else {
-      if (result == 'user-not-found') mostrarErrorEnLogin('Usuario incorrecto');
-      if (result == 'wrong-password') mostrarErrorEnLogin('Contraseña incorrecta');
+      if (result == 'user-not-found') mostrarError('Usuario incorrecto');
+      if (result == 'wrong-password') mostrarError('Contraseña incorrecta');
     }
 
     //Navigator.pop(context);
   }
 
-  void mostrarErrorEnLogin(String mensaje) {
+  void mostrarError(String mensaje) {
       showDialog(
       context: context,
       builder: (BuildContext context) {

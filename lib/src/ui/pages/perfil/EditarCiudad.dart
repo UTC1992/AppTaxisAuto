@@ -140,7 +140,14 @@ class _EditarCiudadState extends State<EditarCiudad> {
       builder: (BuildContext context) {
         // return object of type Dialog
         return AlertDialog(
-          title: new Text("Ciudades disponibles"),
+          title: Container(
+            alignment: Alignment.center,
+            child: Text("Ciudades disponibles"),
+          ),
+          titleTextStyle: TextStyle(
+            fontSize: 20,
+            color: Colors.black
+          ),
           content: SingleChildScrollView(
           child: Container(
             width: 300,

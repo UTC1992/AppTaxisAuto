@@ -62,14 +62,14 @@ class _DrawerState extends State<DrawerNavigation> {
     });
   }
 
-  void confirmarCerrarSesion() {
+   void confirmarCerrarSesion() {
       showDialog(
       context: context,
       builder: (BuildContext context) {
         var screenSize = MediaQuery.of(context).size;
         // return object of type Dialog
         return AlertDialog(
-          title: Text('¿Deseas cerrar la sesión?'),
+          title: Text('¿ Deseas cerrar la sesión ?'),
           titleTextStyle: TextStyle(
             fontSize: 18,
             color: Colors.black
@@ -87,11 +87,18 @@ class _DrawerState extends State<DrawerNavigation> {
                       Navigator.pop(context);
                     },
                     child: Container(
+                      width: screenSize.width * 0.3,
+                      height: 40,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: Colors.red[600],
+                        borderRadius: BorderRadius.circular(10.0)
+                      ),
                       child: Text('Cancelar',
                         style: TextStyle(
                           fontSize: 16,
-                          color: Colors.red[800],
-                          fontWeight: FontWeight.bold
+                          color: Colors.white,
+                          //fontWeight: FontWeight.bold
                         ),
                       ),
                     ),
@@ -101,11 +108,18 @@ class _DrawerState extends State<DrawerNavigation> {
                       cerrarSesion();
                     },
                     child: Container(
+                      width: screenSize.width * 0.3,
+                      height: 40,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: Colors.blue[700],
+                        borderRadius: BorderRadius.circular(10.0)
+                      ),
                       child: Text('Aceptar',
                         style: TextStyle(
                           fontSize: 16,
-                          color: Colors.green[800],
-                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          //fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
@@ -120,6 +134,7 @@ class _DrawerState extends State<DrawerNavigation> {
     );
   
   }
+
 
   cerrarSesion() async {
     await authService.cerrarSesion();

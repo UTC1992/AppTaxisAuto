@@ -41,7 +41,7 @@ class AuthService extends ChangeNotifier {
           notifyListeners();
           return authResult.user != null;
       } catch (e) {
-          return e.message;
+          return e.code;
       }
   }
 
@@ -57,7 +57,7 @@ class AuthService extends ChangeNotifier {
         ));
       return authResult;
     } catch (e) {
-      return e.toString();
+      return e.code;
     }
     
   }

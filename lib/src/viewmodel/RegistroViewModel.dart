@@ -22,11 +22,14 @@ class RegistroViewModel extends AuthService {
         if (result) {
           print('registro exitoso');
           addTaxista(taxista);
+          return true;
         } else {
           print('registro fallo, intente de nuevo');
+          return false;
         }
       } else {
         print('registro fallor un error' + result);
+        return result.toString();
       }
   }
 
