@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:AppTaxisAuto/src/ui/widgets/botones/BtnAceptar.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -150,29 +151,17 @@ class _EditarImagenState extends State<EditarImagen> {
               SizedBox(
                 height: 20,
               ),
-              GestureDetector(
-                onTap: () {
-                  uploadFile();
-                },
-                child: Container(
-                  height: 45,
+              Container(
                   margin: EdgeInsets.symmetric(horizontal: 50),
-                  decoration: BoxDecoration(
-                    color: Colors.green[600],
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Center(
-                    child: Text(
-                      'Actualizar',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
+                  child: BtnAceptar(
+                    activo: true,
+                    onPress: () {
+                      uploadFile();
+                    },
+                    titulo: 'Actualizar',
+                    alto: 45,
                   ),
                 ),
-              ),
             ],
           ),
         ],

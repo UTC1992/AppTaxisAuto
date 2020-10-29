@@ -1,6 +1,7 @@
 import 'package:AppTaxisAuto/src/models/ArgsSolicitudOferta.dart';
 import 'package:AppTaxisAuto/src/models/ArgumentosSolicitudDatos.dart';
 import 'package:AppTaxisAuto/src/models/Taxista.dart';
+import 'package:AppTaxisAuto/src/ui/pages/perfil/EditarAuto.dart';
 import 'package:flutter/material.dart';
 import '../ui/view/Landing.dart';
 import '../ui/view/Bienvenida.dart';
@@ -96,6 +97,17 @@ class RouteGenerator {
         if (args is Taxista) {
           return MaterialPageRoute(
             builder: (_) => EditarCiudad( data: args,),
+          );
+        } 
+        
+        return _errorRoute();
+
+        break;
+      case '/editarDatosAuto':
+
+        if (args is Taxista) {
+          return MaterialPageRoute(
+            builder: (_) => EditarAuto( data: args,),
           );
         } 
         

@@ -1,3 +1,4 @@
+import 'package:AppTaxisAuto/src/ui/widgets/botones/BtnAceptar.dart';
 import 'package:flutter/material.dart';
 import '../../../viewmodel/TaxistaViewModel.dart';
 import '../../../models/Taxista.dart';
@@ -79,32 +80,20 @@ class _EditarNombreState extends State<EditarNombre> {
                 SizedBox(
                   height: 20,
                 ),
-                GestureDetector(
-                  onTap: () {
-                    if(_formKey.currentState.validate()) {
-                      _formKey.currentState.save();
-                      _updateNombreTaxista();
-                    }
-                  },
-                  child: Container(
-                    height: 50,
-                    margin: EdgeInsets.symmetric(horizontal: 50),
-                    decoration: BoxDecoration(
-                      color: Colors.green[600],
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Center(
-                      child: Text(
-                        'Actualizar',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
+                Container(
+                  margin: EdgeInsets.symmetric(horizontal: 50),
+                  child: BtnAceptar(
+                    activo: true,
+                    onPress: () {
+                      if(_formKey.currentState.validate()) {
+                        _formKey.currentState.save();
+                        _updateNombreTaxista();
+                      }
+                    },
+                    titulo: 'Actualizar',
+                    alto: 45,
                   ),
-                )
+                ),
               ],
             ),
           ],

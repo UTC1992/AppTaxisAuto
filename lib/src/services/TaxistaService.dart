@@ -119,6 +119,28 @@ class TaxistaService {
     }
   }
 
+  Future updateVehiculo({
+    @required String documentID, 
+    @required Map auto,
+  }) async {
+    try {
+      await _collectionTaxista
+      .doc(documentID)
+      .update({
+        'auto': {
+          'marca' : auto['marca'],
+          'modelo' : auto['modelo'],
+          'placa' : auto['placa'],
+        }
+
+      });
+
+      return true;
+    } catch (e) {
+      return e.toString();
+    }
+  }
+
   Future updateToken({
     @required String documentID, 
     @required String token,

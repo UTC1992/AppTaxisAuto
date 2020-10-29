@@ -154,6 +154,21 @@ class TaxistaViewModel {
 
   }
 
+  Future updateVehiculo({
+      @required Map auto,
+      @required String documentID,
+  }) async {
+    var result = await _taxistaService.
+    updateVehiculo(documentID: documentID, auto: auto);
+
+    if (result is String) {
+      print('Error al actualizar ' + result);
+    } else {
+      print('Exito al actualizar auto');
+    }
+
+  }
+
   Future updateUbicacionGPS({
     @required String documentID,
     @required double latitude,

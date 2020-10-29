@@ -40,140 +40,162 @@ class _PerfilState extends State<Perfil> {
   Widget build(BuildContext context) {
     return Visibility(
       visible: _isVisible,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-        ),
-        child: Flex(
-          direction: Axis.vertical,
-          children: [
-            Column(
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, '/editarNombre',
-                          arguments: taxista);
-                    },
-                    child: Row(
-                      children: [
-                        Icon(Icons.account_circle, color: Colors.grey[600]),
-                        Expanded(
-                          child: ListTile(
-                            title: Text('Editar nombre'),
+      child: SingleChildScrollView(
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+          ),
+          child: Flex(
+            direction: Axis.vertical,
+            children: [
+              Column(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20,),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(context, '/editarNombre',
+                            arguments: taxista);
+                      },
+                      child: Row(
+                        children: [
+                          Icon(Icons.account_circle, color: Colors.grey[600]),
+                          Expanded(
+                            child: ListTile(
+                              title: Text('Editar nombre'),
+                            ),
                           ),
-                        ),
-                        Icon(Icons.chevron_right, color: Colors.grey[500])
-                      ],
+                          Icon(Icons.chevron_right, color: Colors.grey[500])
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, '/editarImagen',
-                          arguments: taxista);
-                    },
-                    child: Row(
-                      children: [
-                        Icon(Icons.photo, color: Colors.grey[600]),
-                        Expanded(
-                          child: ListTile(
-                            title: Text('Editar imagen'),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20,),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(context, '/editarImagen',
+                            arguments: taxista);
+                      },
+                      child: Row(
+                        children: [
+                          Icon(Icons.photo, color: Colors.grey[600]),
+                          Expanded(
+                            child: ListTile(
+                              title: Text('Editar imagen'),
+                            ),
                           ),
-                        ),
-                        Icon(
-                          Icons.chevron_right,
-                          color: Colors.grey[500],
-                        )
-                      ],
+                          Icon(
+                            Icons.chevron_right,
+                            color: Colors.grey[500],
+                          )
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, '/editarCorreo',
-                          arguments: taxista);
-                    },
-                    child: Row(
-                      children: [
-                        Icon(Icons.email, color: Colors.grey[600]),
-                        Expanded(
-                          child: ListTile(
-                            title: Text('Editar correo'),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20,),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(context, '/editarCorreo',
+                            arguments: taxista);
+                      },
+                      child: Row(
+                        children: [
+                          Icon(Icons.email, color: Colors.grey[600]),
+                          Expanded(
+                            child: ListTile(
+                              title: Text('Editar correo'),
+                            ),
                           ),
-                        ),
-                        Icon(Icons.chevron_right, color: Colors.grey[500])
-                      ],
+                          Icon(Icons.chevron_right, color: Colors.grey[500])
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, '/editarPassword');
-                    },
-                    child: Row(
-                      children: [
-                        Icon(Icons.lock, color: Colors.grey[600]),
-                        Expanded(
-                          child: ListTile(
-                            title: Text('Editar contraseña'),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20, ),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(context, '/editarPassword');
+                      },
+                      child: Row(
+                        children: [
+                          Icon(Icons.lock, color: Colors.grey[600]),
+                          Expanded(
+                            child: ListTile(
+                              title: Text('Editar contraseña'),
+                            ),
                           ),
-                        ),
-                        Icon(Icons.chevron_right, color: Colors.grey[500])
-                      ],
+                          Icon(Icons.chevron_right, color: Colors.grey[500])
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  child: GestureDetector(
-                    onTap: () {
-                       Navigator.pushNamed(context, '/editarTelefono',
-                          arguments: taxista);
-                    },
-                    child: Row(
-                      children: [
-                        Icon(Icons.phone, color: Colors.grey[600]),
-                        Expanded(
-                          child: ListTile(
-                            title: Text('Editar teléfono'),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20, ),
+                    child: GestureDetector(
+                      onTap: () {
+                          Navigator.pushNamed(context, '/editarTelefono',
+                            arguments: taxista);
+                      },
+                      child: Row(
+                        children: [
+                          Icon(Icons.phone, color: Colors.grey[600]),
+                          Expanded(
+                            child: ListTile(
+                              title: Text('Editar teléfono'),
+                            ),
                           ),
-                        ),
-                        Icon(Icons.chevron_right, color: Colors.grey[500])
-                      ],
+                          Icon(Icons.chevron_right, color: Colors.grey[500])
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  child: GestureDetector(
-                    onTap: () {
-                       Navigator.pushNamed(context, '/editarCiudad',
-                          arguments: taxista);
-                    },
-                    child: Row(
-                      children: [
-                        Icon(Icons.location_city, color: Colors.grey[600]),
-                        Expanded(
-                          child: ListTile(
-                            title: Text('Editar ciudad'),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20,),
+                    child: GestureDetector(
+                      onTap: () {
+                          Navigator.pushNamed(context, '/editarCiudad',
+                            arguments: taxista);
+                      },
+                      child: Row(
+                        children: [
+                          Icon(Icons.location_city, color: Colors.grey[600]),
+                          Expanded(
+                            child: ListTile(
+                              title: Text('Editar ciudad'),
+                            ),
                           ),
-                        ),
-                        Icon(Icons.chevron_right, color: Colors.grey[500])
-                      ],
+                          Icon(Icons.chevron_right, color: Colors.grey[500])
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20, ),
+                    child: GestureDetector(
+                      onTap: () {
+                          Navigator.pushNamed(context, '/editarDatosAuto',
+                            arguments: taxista);
+                      },
+                      child: Row(
+                        children: [
+                          Icon(Icons.location_city, color: Colors.grey[600]),
+                          Expanded(
+                            child: ListTile(
+                              title: Text('Editar datos del vehículo'),
+                            ),
+                          ),
+                          Icon(Icons.chevron_right, color: Colors.grey[500])
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

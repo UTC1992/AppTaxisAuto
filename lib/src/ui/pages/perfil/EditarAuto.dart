@@ -1,39 +1,58 @@
+import 'package:AppTaxisAuto/src/models/Taxista.dart';
 import 'package:AppTaxisAuto/src/ui/widgets/botones/BtnAceptar.dart';
 import 'package:flutter/material.dart';
 import '../../../viewmodel/TaxistaViewModel.dart';
 
-class EditarPassword extends StatefulWidget {
-  _EditarPasswordState createState() => _EditarPasswordState();
+class EditarAuto extends StatefulWidget {
+
+  final Taxista data;
+
+  EditarAuto({
+    Key key,
+    @required this.data,
+  }) : super(key: key);
+
+  _EditarAutoState createState() => _EditarAutoState();
 }
 
-class _EditarPasswordState extends State<EditarPassword> {
+class _EditarAutoState extends State<EditarAuto> {
   final _formKey = GlobalKey<FormState>();
   TaxistaViewModel _taxistaViewModel = TaxistaViewModel();
 
-  String passwordAnterior;
-  String passwordNueva;
-  String email;
+  String marca;
+  String modelo;
+  String placa;
+  String documentoID;
 
   @override
   void initState() {
+
+    marca = widget.data.auto['marca'];
+    modelo = widget.data.auto['modelo'];
+    placa = widget.data.auto['placa'];
+    documentoID = widget.data.documentId;
+
     super.initState();
   }
 
-  _updatePassword() {
-    print('password => ' + passwordAnterior);
-    _taxistaViewModel.reautenticate(passwordAnterior).then((value) {
-      _taxistaViewModel.updatePasswordTaxista(password: passwordNueva);
-      Navigator.pop(context);
-    }).catchError((error) {
-      print(error);
-    });
+  _updateVehiculo() async {
+
+    Map auto = {
+      'marca' : marca,
+      'modelo' : modelo,
+      'placa' : placa,
+    };
+    
+    await _taxistaViewModel.updateVehiculo(auto: auto, documentID: documentoID);
+    Navigator.pop(context);
   }
+  
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Editar contraseña'),
+        title: Text('Editar vehículo'),
       ),
       body: getContainer(),
     );
@@ -56,24 +75,23 @@ class _EditarPasswordState extends State<EditarPassword> {
                   ),
                   Padding(
                     padding: EdgeInsets.all(10),
-                    child: Text('CONTRASEÑA ANTERIOR'),
+                    child: Text('MARCA'),
                   ),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20),
                     child: TextFormField(
-                      controller: TextEditingController(text: ''),
+                      controller: TextEditingController(text: marca != null ? marca+'' : ''),
                       autofocus: true,
                       validator: (value) {
                         if (value.isEmpty) {
-                          return 'Contraseña requerida.';
+                          return 'Marca del auto requerida.';
                         }
 
                         return null;
                       },
                       onChanged: (value) {
-                        passwordAnterior = value;
+                        marca = value;
                       },
-                      obscureText: true,
                     ),
                   ),
                   SizedBox(
@@ -81,24 +99,47 @@ class _EditarPasswordState extends State<EditarPassword> {
                   ),
                   Padding(
                     padding: EdgeInsets.all(10),
-                    child: Text('CONTRASEÑA NUEVA'),
+                    child: Text('MODELO'),
                   ),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20),
                     child: TextFormField(
-                      controller: TextEditingController(text: ''),
+                      controller: TextEditingController(text: modelo != null ? modelo+'' : ''),
                       autofocus: false,
                       validator: (value) {
                         if (value.isEmpty) {
-                          return 'Confirmar contraseña.';
+                          return 'Modelo del auto requirido';
                         }
 
                         return null;
                       },
                       onChanged: (value) {
-                        passwordNueva = value;
+                        modelo = value;
                       },
-                      obscureText: true,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(10),
+                    child: Text('PLACA'),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: TextFormField(
+                      controller: TextEditingController(text: placa != null ? placa+'' : ''),
+                      autofocus: false,
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'Placa del auto requerida';
+                        }
+
+                        return null;
+                      },
+                      onChanged: (value) {
+                        placa = value;
+                      },
                     ),
                   ),
                   SizedBox(
@@ -111,7 +152,7 @@ class _EditarPasswordState extends State<EditarPassword> {
                       onPress: () {
                         if (_formKey.currentState.validate()) {
                           _formKey.currentState.save();
-                          _updatePassword();
+                          _updateVehiculo();
                         }
                       },
                       titulo: 'Actualizar',
